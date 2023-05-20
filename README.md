@@ -1,11 +1,11 @@
-{-
 # purescript-data-mvc
 
 ## Sample
 ### Imports
 For the examples below, we'll need the following imports:
--}
 
+
+```hs
 module Test.ReadmeSample where
 
 import Prelude hiding (div)
@@ -13,13 +13,14 @@ import Prelude hiding (div)
 import MVC.Record (RecordMsg, RecordState, viewRecord, updateRecord)
 import Unsafe.Coerce (unsafeCoerce)
 import VirtualDOM as V
+```
 
-{-
 ### Example components
 Let's define some example components that we'll use in our app.
 The first one could look like this, it's a simple counter:
--}
 
+
+```hs
 data Msg1 = Increment | Decrement
 
 type State1 = Int
@@ -36,12 +37,13 @@ view1 state =
     , V.div [ V.onClick Decrement ] [ V.text "less!" ]
     , V.div [] [ V.text ("Count: " <> show state) ]
     ]
+```
 
-{-
 The next ones we leave unimplemented for now, it's only important that they 
 follow the same pattern but have different types:
--}
 
+
+```hs
 data Msg2 = Msg2
 data State2 = State2
 
@@ -61,11 +63,12 @@ update3 = unsafeCoerce "unimplemented!"
 
 view3 :: forall html. V.Html html => State3 -> html Msg3
 view3 = unsafeCoerce "unimplemented!"
+```
 
-{-
 ### Mount all components, the manual way
--}
 
+
+```hs
 data AppMsg
   = AppMsg1 Msg1
   | AppMsg2 Msg2
@@ -102,11 +105,12 @@ appView state =
         , map AppMsg3 $ view3 state.state3
         ]
     ]
+```
 
-{-
 ### Mount all components, generically using this library:
--}
 
+
+```hs
 type Msg' = RecordMsg
   ( field1 :: Msg1
   , field2 :: Msg2
@@ -141,3 +145,4 @@ view' state =
               , viewValue
               ]
     )
+```
