@@ -31,6 +31,8 @@ simple state update functions.
 module Sample.Component1 where
 
 import Prelude
+
+import MVC.Types (UI)
 import VirtualDOM as VD
 ```
 
@@ -52,20 +54,25 @@ update msg state = case msg of
 
 view :: forall html. VD.Html html => State -> html Msg
 view state =
-  VD.div []
-    [ VD.button [ VD.onClick Increment ] [ VD.text "more!" ]
-    , VD.button [ VD.onClick Decrement ] [ VD.text "less!" ]
+  VD.div [ VD.id "ui1" ]
+    [ VD.button [ VD.id "more", VD.onClick Increment ] [ VD.text "more!" ]
+    , VD.button [ VD.id "less", VD.onClick Decrement ] [ VD.text "less!" ]
     , VD.div [] [ VD.text ("Count: " <> show state) ]
     ]
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
 ```
+
+![UI1](./assets/gif/ui1.gif)
+
 #### Component 2
 
 
 ```hs
 module Sample.Component2 where
 
-import Prelude hiding (div)
-
+import MVC.Types (UI)
 import VirtualDOM as VD
 
 data Msg = SetName String
@@ -80,7 +87,7 @@ update (SetName name) _ = name
 
 view :: forall html. VD.Html html => State -> html Msg
 view state =
-  VD.div []
+  VD.div [ VD.id "ui2" ]
     [ VD.div [] [ VD.text "Name:" ]
     , VD.input
         [ VD.type_ "text"
@@ -88,7 +95,13 @@ view state =
         , VD.value state
         ]
     ]
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
 ```
+
+![UI2](./assets/gif/ui2.gif)
+
 #### Component 3
 
 
@@ -97,6 +110,7 @@ module Sample.Component3 where
 
 import Prelude
 
+import MVC.Types (UI)
 import VirtualDOM as VD
 
 data Msg = Toggle
@@ -111,18 +125,23 @@ update Toggle = not
 
 view :: forall html. VD.Html html => State -> html Msg
 view state =
-  VD.div []
+  VD.div [ VD.id "ui3" ]
     [ VD.label_
         [ VD.input
             [ VD.type_ "checkbox"
             , VD.checked state
             , VD.onChange (const Toggle)
             ]
-
         , VD.text "Checked?"
         ]
     ]
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
 ```
+
+![UI3](./assets/gif/ui3.gif)
+
 ### Mount all components
 #### The manual way
 
@@ -188,7 +207,9 @@ module Sample.Record.Generically where
 
 import Prelude
 
-import MVC.Record (RecordMsg, RecordState(..), updateRecord, viewRecord)
+import MVC.Record (RecordMsg, RecordState)
+import MVC.Record.UI (uiRecord)
+import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
@@ -206,33 +227,29 @@ type State = RecordState
   , field3 :: C3.State
   )
 
-init :: State
-init = RecordState
-  { field1: C1.init
-  , field2: C2.init
-  , field3: C3.init
+ui :: forall html. VD.Html html => UI html Msg State
+ui = uiRecord
+  { field1: C1.ui
+  , field2: C2.ui
+  , field3: C3.ui
   }
+  { view: { viewEntries } }
 
-update :: Msg -> State -> State
-update = updateRecord
-  { field1: C1.update
-  , field2: C2.update
-  , field3: C3.update
-  }
-
-view :: forall html. VD.Html html => State -> html Msg
-view state =
+viewEntries
+  :: forall html msg
+   . VD.Html html
+  => Array { key :: String, viewValue :: html msg }
+  -> html msg
+viewEntries entries =
   VD.table_
-    ( viewRecord
-        { field1: C1.view
-        , field2: C2.view
-        , field3: C3.view
-        }
-        state
-        # map \{ key, viewValue } ->
-            VD.tr_
-              [ VD.td_ [ VD.text key ]
-              , VD.td_ [ viewValue ]
-              ]
+    ( entries # map
+        \{ key, viewValue } ->
+          VD.tr_
+            [ VD.td_ [ VD.text key ]
+            , VD.td_ [ viewValue ]
+            ]
     )
 ```
+
+![UI Record](./assets/gif/ui-record.gif)
+

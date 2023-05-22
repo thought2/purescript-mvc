@@ -1,3 +1,3 @@
 module MVC.Variant where
 
-import Prelude
+-- import Prelude

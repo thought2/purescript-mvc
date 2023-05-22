@@ -1,9 +1,5 @@
 { name = "data-mvc"
-, dependencies =
-  [ "prelude"
-  , "record"
-  , "variant"
-  ]
+, dependencies = [ "heterogeneous", "newtype", "prelude", "record", "variant" ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]
 }

@@ -14,12 +14,16 @@ import Type.Proxy (Proxy(..))
 type ViewResult :: (Type -> Type) -> Type -> Type
 type ViewResult html msg = { key :: String, viewValue :: html msg }
 
+type ViewRecordProps html msg =
+  { viewEntries :: Array (ViewResult html msg) -> html msg
+  }
+
 class ViewRecord :: (Type -> Type) -> Row Type -> Row Type -> Row Type -> Constraint
 class
   ViewRecord html views rmsg rsta
 
   where
-  viewRecord :: Record views -> RecordState rsta -> Array (ViewResult html (RecordMsg rmsg))
+  viewRecord :: Record views -> ViewRecordProps html (RecordMsg rmsg) -> RecordState rsta ->  html (RecordMsg rmsg)
 
 instance
   ( RowToList views rl
@@ -27,7 +31,7 @@ instance
   ) =>
   ViewRecord html views rmsg rsta
   where
-  viewRecord fieldViews = viewRL prxRL fieldViews
+  viewRecord fieldViews props = viewRL prxRL fieldViews <#> props.viewEntries
     where
     prxRL = Proxy :: _ rl
 

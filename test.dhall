@@ -1,6 +1,6 @@
 let conf = ./spago.dhall
 in conf // {
-  sources = conf.sources # [ "test/**/*.purs", "sample/**/*.purs" ],
+  sources = conf.sources # [ "test/**/*.purs", "samples/**/*.purs" ],
   dependencies = conf.dependencies # 
     [ "aff"
     , "effect"
@@ -13,5 +13,6 @@ in conf // {
     , "virtual-dom-halogen"
     , "integers"
     , "maybe"
+    , "routing"
     ]
 }

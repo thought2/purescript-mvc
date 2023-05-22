@@ -5,6 +5,8 @@
 module Sample.Component3 where
 
 import Prelude
+
+import MVC.Types (UI)
 import VirtualDOM as VD
 
 data Msg = Toggle
@@ -19,14 +21,20 @@ update Toggle = not
 
 view :: forall html. VD.Html html => State -> html Msg
 view state =
-  VD.div []
+  VD.div [ VD.id "ui3" ]
     [ VD.label_
         [ VD.input
             [ VD.type_ "checkbox"
             , VD.checked state
             , VD.onChange (const Toggle)
             ]
-
         , VD.text "Checked?"
         ]
     ]
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
+
+{-
+![UI3](./assets/gif/ui3.gif)
+-}

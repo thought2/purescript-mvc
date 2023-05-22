@@ -6,7 +6,9 @@ module Sample.Record.Generically where
 
 import Prelude
 
-import MVC.Record (RecordMsg, RecordState(..), updateRecord, viewRecord)
+import MVC.Record (RecordMsg, RecordState)
+import MVC.Record.UI (uiRecord)
+import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
@@ -24,32 +26,30 @@ type State = RecordState
   , field3 :: C3.State
   )
 
-init :: State
-init = RecordState
-  { field1: C1.init
-  , field2: C2.init
-  , field3: C3.init
+ui :: forall html. VD.Html html => UI html Msg State
+ui = uiRecord
+  { field1: C1.ui
+  , field2: C2.ui
+  , field3: C3.ui
   }
+  { view: { viewEntries } }
 
-update :: Msg -> State -> State
-update = updateRecord
-  { field1: C1.update
-  , field2: C2.update
-  , field3: C3.update
-  }
-
-view :: forall html. VD.Html html => State -> html Msg
-view state =
+viewEntries
+  :: forall html msg
+   . VD.Html html
+  => Array { key :: String, viewValue :: html msg }
+  -> html msg
+viewEntries entries =
   VD.table_
-    ( viewRecord
-        { field1: C1.view
-        , field2: C2.view
-        , field3: C3.view
-        }
-        state
-        # map \{ key, viewValue } ->
-            VD.tr_
-              [ VD.td_ [ VD.text key ]
-              , VD.td_ [ viewValue ]
-              ]
+    ( entries # map
+        \{ key, viewValue } ->
+          VD.tr_
+            [ VD.td_ [ VD.text key ]
+            , VD.td_ [ viewValue ]
+            ]
     )
+
+
+{-
+![UI Record](./assets/gif/ui-record.gif)
+-}

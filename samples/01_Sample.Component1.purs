@@ -21,6 +21,8 @@ simple state update functions.
 module Sample.Component1 where
 
 import Prelude
+
+import MVC.Types (UI)
 import VirtualDOM as VD
 
 {-
@@ -41,9 +43,15 @@ update msg state = case msg of
 
 view :: forall html. VD.Html html => State -> html Msg
 view state =
-  VD.div []
-    [ VD.button [ VD.onClick Increment ] [ VD.text "more!" ]
-    , VD.button [ VD.onClick Decrement ] [ VD.text "less!" ]
+  VD.div [ VD.id "ui1" ]
+    [ VD.button [ VD.id "more", VD.onClick Increment ] [ VD.text "more!" ]
+    , VD.button [ VD.id "less", VD.onClick Decrement ] [ VD.text "less!" ]
     , VD.div [] [ VD.text ("Count: " <> show state) ]
     ]
 
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
+
+{-
+![UI1](./assets/gif/ui1.gif)
+-}

@@ -9,83 +9,83 @@ import Prim.RowList as RL
 import Type.Function (type ($), type (#))
 import Type.Proxy (Proxy(..))
 
------------------------------------------------------------
---- View
------------------------------------------------------------
+-- -----------------------------------------------------------
+-- --- View
+-- -----------------------------------------------------------
 
-testView :: Array (ME.ViewResult HTML (ME.RecordMsg (field1 :: M1, field2 :: M2, field3 :: M3)))
-testView = ME.viewRecord
-  { field1: \(_ :: S1) -> HTML :: _ M1
-  , field2: \(_ :: S2) -> HTML :: _ M2
-  , field3: \(_ :: S3) -> HTML :: _ M3
-  }
-  ( ME.RecordState
-      { field1: S1
-      , field2: S2
-      , field3: S3
-      }
-  )
+-- testView :: Array (ME.ViewResult HTML (ME.RecordMsg (field1 :: M1, field2 :: M2, field3 :: M3)))
+-- testView = ME.viewRecord
+--   { field1: \(_ :: S1) -> HTML :: _ M1
+--   , field2: \(_ :: S2) -> HTML :: _ M2
+--   , field3: \(_ :: S3) -> HTML :: _ M3
+--   }
+--   ( ME.RecordState
+--       { field1: S1
+--       , field2: S2
+--       , field3: S3
+--       }
+--   )
 
-testViewRL :: Array (ME.ViewResult HTML (ME.RecordMsg (field1 :: M1, field2 :: M2, field3 :: M3)))
-testViewRL = ME.viewRL
-  ( Proxy
-      :: _ $ RL.Nil
-           # RL.Cons "field3" Unit
-           # RL.Cons "field2" Unit
-           # RL.Cons "field1" Unit
-  )
-  { field1: \(_ :: S1) -> HTML :: _ M1
-  , field2: \(_ :: S2) -> HTML :: _ M2
-  , field3: \(_ :: S3) -> HTML :: _ M3
-  }
-  ( ME.RecordState
-      { field1: S1
-      , field2: S2
-      , field3: S3
-      }
-  )
+-- testViewRL :: Array (ME.ViewResult HTML (ME.RecordMsg (field1 :: M1, field2 :: M2, field3 :: M3)))
+-- testViewRL = ME.viewRL
+--   ( Proxy
+--       :: _ $ RL.Nil
+--            # RL.Cons "field3" Unit
+--            # RL.Cons "field2" Unit
+--            # RL.Cons "field1" Unit
+--   )
+--   { field1: \(_ :: S1) -> HTML :: _ M1
+--   , field2: \(_ :: S2) -> HTML :: _ M2
+--   , field3: \(_ :: S3) -> HTML :: _ M3
+--   }
+--   ( ME.RecordState
+--       { field1: S1
+--       , field2: S2
+--       , field3: S3
+--       }
+--   )
 
------------------------------------------------------------
---- Update
------------------------------------------------------------
+-- -----------------------------------------------------------
+-- --- Update
+-- -----------------------------------------------------------
 
-testUpdate :: RecordState (field1 :: S1, field2 :: S2, field3 :: S3)
-testUpdate = updateRecord
-  { field1: \(_ :: M1) (_ :: S1) -> S1
-  , field2: \(_ :: M2) (_ :: S2) -> S2
-  , field3: \(_ :: M3) (_ :: S3) -> S3
-  }
-  (Set (V.inj (Proxy :: _ "field2") M2))
-  ( RecordState
-      { field1: S1
-      , field2: S2
-      , field3: S3
-      }
-  )
+-- testUpdate :: RecordState (field1 :: S1, field2 :: S2, field3 :: S3)
+-- testUpdate = updateRecord
+--   { field1: \(_ :: M1) (_ :: S1) -> S1
+--   , field2: \(_ :: M2) (_ :: S2) -> S2
+--   , field3: \(_ :: M3) (_ :: S3) -> S3
+--   }
+--   (Set (V.inj (Proxy :: _ "field2") M2))
+--   ( RecordState
+--       { field1: S1
+--       , field2: S2
+--       , field3: S3
+--       }
+--   )
 
-testUpdateRL :: RecordState (field1 :: S1, field2 :: S2, field3 :: S3)
-testUpdateRL = updateRecordRL
-  ( Proxy
-      :: _ $ RL.Nil
-           # RL.Cons "field3" Unit
-           # RL.Cons "field2" Unit
-           # RL.Cons "field1" Unit
-  )
-  { field1: \(_ :: M1) (_ :: S1) -> S1
-  , field2: \(_ :: M2) (_ :: S2) -> S2
-  , field3: \(_ :: M3) (_ :: S3) -> S3
-  }
-  ( RecordState
-      { field1: S1
-      , field2: S2
-      , field3: S3
-      }
-  )
-  (V.inj (Proxy :: _ "field2") M2)
+-- testUpdateRL :: RecordState (field1 :: S1, field2 :: S2, field3 :: S3)
+-- testUpdateRL = updateRecordRL
+--   ( Proxy
+--       :: _ $ RL.Nil
+--            # RL.Cons "field3" Unit
+--            # RL.Cons "field2" Unit
+--            # RL.Cons "field1" Unit
+--   )
+--   { field1: \(_ :: M1) (_ :: S1) -> S1
+--   , field2: \(_ :: M2) (_ :: S2) -> S2
+--   , field3: \(_ :: M3) (_ :: S3) -> S3
+--   }
+--   ( RecordState
+--       { field1: S1
+--       , field2: S2
+--       , field3: S3
+--       }
+--   )
+--   (V.inj (Proxy :: _ "field2") M2)
 
------------------------------------------------------------
---- Test types
------------------------------------------------------------
+-- -----------------------------------------------------------
+-- --- Test types
+-- -----------------------------------------------------------
 
 data M1 = M1
 data M2 = M2

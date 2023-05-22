@@ -44,3 +44,12 @@ check-format:
     purs-tidy check "src/**/*.purs"
     purs-tidy check "test/**/*.purs"
     purs-tidy check "samples/**/*.purs"
+
+gen-gifs:
+    rm -rf assets/gif
+    node run.js
+    for file in assets/gif/*.mp4; do \
+      output="${file%.*}.gif" ; \
+      ffmpeg -i $file  -y -loop 0 $output ; \
+    done
+    rm -rf assets/gif/*.mp4

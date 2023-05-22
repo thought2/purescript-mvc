@@ -12,16 +12,19 @@ import Record as Record
 import Type.Proxy (Proxy(..))
 import MVC.Record.Types (RecordMsg(..), RecordState(..))
 
-class UpdateRecord rsta rmsg updates where
+class UpdateRecord updates  rmsg rsta 
+  | updates -> rmsg rsta
+  where
   updateRecord
     :: Record updates
     -> (RecordMsg rmsg -> RecordState rsta -> RecordState rsta)
 
 instance
-  ( RowToList rs rl
-  , UpdateRecordRL rl rs rm updates
+  ( RowToList rsta rl
+  , UpdateRecordRL rl rsta rmsg updates
   ) =>
-  UpdateRecord rs rm updates where
+  UpdateRecord updates rmsg rsta 
+  where
   updateRecord updates (Set v) state =
     updateRecordRL (Proxy :: _ rl) updates state v
 
