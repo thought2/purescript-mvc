@@ -150,6 +150,8 @@ ui = { view, update, init }
 module Sample.Record.Manually where
 
 import Prelude
+
+import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
@@ -198,6 +200,9 @@ view state =
         , VD.td_ [ map Msg3 $ C3.view state.state3 ]
         ]
     ]
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
 ```
 #### The generic way
 
