@@ -1,6 +1,10 @@
 {-
 # purescript-data-mvc
 
+<!-- AUTO-GENERATED-CONTENT:START (TOC) -->
+toc will be generated here
+<!-- AUTO-GENERATED-CONTENT:END -->
+
 ## Sample
 ### Imports
 For the examples below, we'll need the following imports:
@@ -10,60 +14,93 @@ module Test.ReadmeSample where
 
 import Prelude hiding (div)
 
-import MVC.Record (RecordMsg, RecordState, viewRecord, updateRecord)
-import Unsafe.Coerce (unsafeCoerce)
-import VirtualDOM as V
+import Data.Int as Int
+import Data.Maybe (fromMaybe)
+import MVC.Record (RecordMsg, RecordState(..), updateRecord, viewRecord)
+import VirtualDOM as VD
 
 {-
 ### Example components
 Let's define some example components that we'll use in our app.
-The first one could look like this, it's a simple counter:
+
+#### Component 1
 -}
 
 data Msg1 = Increment | Decrement
 
 type State1 = Int
 
+init1 :: State1
+init1 = 0
+
 update1 :: Msg1 -> State1 -> State1
 update1 msg state = case msg of
   Increment -> state + 1
   Decrement -> state - 1
 
-view1 :: forall html. V.Html html => State1 -> html Msg1
+view1 :: forall html. VD.Html html => State1 -> html Msg1
 view1 state =
-  V.div []
-    [ V.div [ V.onClick Increment ] [ V.text "more!" ]
-    , V.div [ V.onClick Decrement ] [ V.text "less!" ]
-    , V.div [] [ V.text ("Count: " <> show state) ]
+  VD.div []
+    [ VD.button [ VD.onClick Increment ] [ VD.text "more!" ]
+    , VD.button [ VD.onClick Decrement ] [ VD.text "less!" ]
+    , VD.div [] [ VD.text ("Count: " <> show state) ]
     ]
 
 {-
-The next ones we leave unimplemented for now, it's only important that they 
-follow the same pattern but have different types:
+#### Component 2
 -}
 
-data Msg2 = Msg2
-data State2 = State2
+data Msg2 = SetName String
+
+type State2 = String
+
+init2 :: State2
+init2 = ""
 
 update2 :: Msg2 -> State2 -> State2
-update2 = unsafeCoerce "unimplemented!"
+update2 (SetName name) _ = name
 
-view2 :: forall html. V.Html html => State2 -> html Msg2
-view2 = unsafeCoerce "unimplemented!"
-
---- And one more:
-
-data Msg3 = Msg3
-data State3 = State3
-
-update3 :: Msg3 -> State3 -> State3
-update3 = unsafeCoerce "unimplemented!"
-
-view3 :: forall html. V.Html html => State3 -> html Msg3
-view3 = unsafeCoerce "unimplemented!"
+view2 :: forall html. VD.Html html => State2 -> html Msg2
+view2 state =
+  VD.div []
+    [ VD.div [] [ VD.text "Name:" ]
+    , VD.input
+        [ VD.type_ "text"
+        , VD.onChange SetName
+        , VD.value state
+        ]
+    ]
 
 {-
-### Mount all components, the manual way
+#### Component 3
+-}
+
+data Msg3 = SetAge Int
+
+type State3 = Int
+
+init3 :: State3
+init3 = 0
+
+update3 :: Msg3 -> State3 -> State3
+update3 (SetAge age) _ = age
+
+view3 :: forall html. VD.Html html => State3 -> html Msg3
+view3 state =
+  VD.div []
+    [ VD.div [] [ VD.text "Age:" ]
+    , VD.input
+        [ VD.type_ "text"
+        , VD.onChange $ strToInt >>> SetAge
+        , VD.value (show state)
+        ]
+    ]
+  where
+  strToInt = Int.fromStringAs Int.decimal >>> fromMaybe 0
+
+{-
+### Mount all components
+#### The manual way
 -}
 
 data AppMsg
@@ -77,6 +114,13 @@ type AppState =
   , state3 :: State3
   }
 
+appInit :: AppState
+appInit =
+  { state1: init1
+  , state2: init2
+  , state3: init3
+  }
+
 appUpdate :: AppMsg -> AppState -> AppState
 appUpdate msg state = case msg of
   AppMsg1 childMsg -> state
@@ -86,25 +130,25 @@ appUpdate msg state = case msg of
   AppMsg3 childMsg -> state
     { state3 = update3 childMsg state.state3 }
 
-appView :: forall html. V.Html html => AppState -> html AppMsg
+appView :: forall html. VD.Html html => AppState -> html AppMsg
 appView state =
-  V.div_
-    [ V.div_
-        [ V.div_ [ V.text "Field 1:" ]
-        , map AppMsg1 $ view1 state.state1
+  VD.table_
+    [ VD.tr_
+        [ VD.td_ [ VD.text "field1" ]
+        , VD.td_ [ map AppMsg1 $ view1 state.state1 ]
         ]
-    , V.div_
-        [ V.div_ [ V.text "Field 2:" ]
-        , map AppMsg2 $ view2 state.state2
+    , VD.tr_
+        [ VD.td_ [ VD.text "field2" ]
+        , VD.td_ [ map AppMsg2 $ view2 state.state2 ]
         ]
-    , V.div_
-        [ V.div_ [ V.text "Field 3:" ]
-        , map AppMsg3 $ view3 state.state3
+    , VD.tr_
+        [ VD.td_ [ VD.text "field3" ]
+        , VD.td_ [ map AppMsg3 $ view3 state.state3 ]
         ]
     ]
 
 {-
-### Mount all components, generically using this library:
+#### The generic way using this library
 -}
 
 type Msg' = RecordMsg
@@ -119,6 +163,13 @@ type State' = RecordState
   , field3 :: State3
   )
 
+appInit' :: State'
+appInit' = RecordState
+  { field1: init1
+  , field2: init2
+  , field3: init3
+  }
+
 appUpdate' :: Msg' -> State' -> State'
 appUpdate' = updateRecord
   { field1: update1
@@ -126,9 +177,9 @@ appUpdate' = updateRecord
   , field3: update3
   }
 
-view' :: forall html. V.Html html => State' -> html Msg'
-view' state =
-  V.div []
+appView' :: forall html. VD.Html html => State' -> html Msg'
+appView' state =
+  VD.table_
     ( viewRecord
         { field1: view1
         , field2: view2
@@ -136,8 +187,13 @@ view' state =
         }
         state
         # map \{ key, viewValue } ->
-            V.div_
-              [ V.div_ [ V.text ("Field " <> key <> ":") ]
-              , viewValue
+            VD.tr_
+              [ VD.td_ [ VD.text key ]
+              , VD.td_ [ viewValue ]
               ]
     )
+
+{-
+### Mount one of the components
+#### The manual way
+-}

@@ -1,148 +1,238 @@
+
 # purescript-data-mvc
 
+<!-- AUTO-GENERATED-CONTENT:START (TOC) -->
+- [Sample](#sample)
+  - [Sample Components](#sample-components)
+    - [Component 1](#component-1)
+    - [Component 2](#component-2)
+    - [Component 3](#component-3)
+  - [Mount all components](#mount-all-components)
+    - [The manual way](#the-manual-way)
+    - [The generic way](#the-generic-way)
+<!-- AUTO-GENERATED-CONTENT:END -->
+
 ## Sample
-### Imports
-For the examples below, we'll need the following imports:
+
+### Sample Components
+To demonstrate the use of this library, we'll first define three simple UI
+components. We'll use the
+[virtual-dom](https://github.com/thought2/purescript-virtual-dom) library to
+define framework agnostic HTML. The components have state which is defined by
+simple state update functions.
+
+#### Component 1
+
+<details>
+  <summary><code>Sample.Component1</code></summary>
 
 
 ```hs
-module Test.ReadmeSample where
+module Sample.Component1 where
 
-import Prelude hiding (div)
-
-import MVC.Record (RecordMsg, RecordState, viewRecord, updateRecord)
-import Unsafe.Coerce (unsafeCoerce)
-import VirtualDOM as V
+import Prelude
+import VirtualDOM as VD
 ```
 
-### Example components
-Let's define some example components that we'll use in our app.
-The first one could look like this, it's a simple counter:
+</details>
 
 
 ```hs
-data Msg1 = Increment | Decrement
+data Msg = Increment | Decrement
 
-type State1 = Int
+type State = Int
 
-update1 :: Msg1 -> State1 -> State1
-update1 msg state = case msg of
+init :: State
+init = 0
+
+update :: Msg -> State -> State
+update msg state = case msg of
   Increment -> state + 1
   Decrement -> state - 1
 
-view1 :: forall html. V.Html html => State1 -> html Msg1
-view1 state =
-  V.div []
-    [ V.div [ V.onClick Increment ] [ V.text "more!" ]
-    , V.div [ V.onClick Decrement ] [ V.text "less!" ]
-    , V.div [] [ V.text ("Count: " <> show state) ]
+view :: forall html. VD.Html html => State -> html Msg
+view state =
+  VD.div []
+    [ VD.button [ VD.onClick Increment ] [ VD.text "more!" ]
+    , VD.button [ VD.onClick Decrement ] [ VD.text "less!" ]
+    , VD.div [] [ VD.text ("Count: " <> show state) ]
     ]
 ```
-
-The next ones we leave unimplemented for now, it's only important that they 
-follow the same pattern but have different types:
+#### Component 2
 
 
 ```hs
-data Msg2 = Msg2
-data State2 = State2
+module Sample.Component2 where
 
-update2 :: Msg2 -> State2 -> State2
-update2 = unsafeCoerce "unimplemented!"
+import Prelude hiding (div)
 
-view2 :: forall html. V.Html html => State2 -> html Msg2
-view2 = unsafeCoerce "unimplemented!"
+import VirtualDOM as VD
 
---- And one more:
+data Msg = SetName String
 
-data Msg3 = Msg3
-data State3 = State3
+type State = String
 
-update3 :: Msg3 -> State3 -> State3
-update3 = unsafeCoerce "unimplemented!"
+init :: State
+init = ""
 
-view3 :: forall html. V.Html html => State3 -> html Msg3
-view3 = unsafeCoerce "unimplemented!"
-```
+update :: Msg -> State -> State
+update (SetName name) _ = name
 
-### Mount all components, the manual way
-
-
-```hs
-data AppMsg
-  = AppMsg1 Msg1
-  | AppMsg2 Msg2
-  | AppMsg3 Msg3
-
-type AppState =
-  { state1 :: State1
-  , state2 :: State2
-  , state3 :: State3
-  }
-
-appUpdate :: AppMsg -> AppState -> AppState
-appUpdate msg state = case msg of
-  AppMsg1 childMsg -> state
-    { state1 = update1 childMsg state.state1 }
-  AppMsg2 childMsg -> state
-    { state2 = update2 childMsg state.state2 }
-  AppMsg3 childMsg -> state
-    { state3 = update3 childMsg state.state3 }
-
-appView :: forall html. V.Html html => AppState -> html AppMsg
-appView state =
-  V.div_
-    [ V.div_
-        [ V.div_ [ V.text "Field 1:" ]
-        , map AppMsg1 $ view1 state.state1
-        ]
-    , V.div_
-        [ V.div_ [ V.text "Field 2:" ]
-        , map AppMsg2 $ view2 state.state2
-        ]
-    , V.div_
-        [ V.div_ [ V.text "Field 3:" ]
-        , map AppMsg3 $ view3 state.state3
+view :: forall html. VD.Html html => State -> html Msg
+view state =
+  VD.div []
+    [ VD.div [] [ VD.text "Name:" ]
+    , VD.input
+        [ VD.type_ "text"
+        , VD.onChange SetName
+        , VD.value state
         ]
     ]
 ```
-
-### Mount all components, generically using this library:
+#### Component 3
 
 
 ```hs
-type Msg' = RecordMsg
-  ( field1 :: Msg1
-  , field2 :: Msg2
-  , field3 :: Msg3
-  )
+module Sample.Component3 where
 
-type State' = RecordState
-  ( field1 :: State1
-  , field2 :: State2
-  , field3 :: State3
-  )
+import Prelude
 
-appUpdate' :: Msg' -> State' -> State'
-appUpdate' = updateRecord
-  { field1: update1
-  , field2: update2
-  , field3: update3
+import VirtualDOM as VD
+
+data Msg = Toggle
+
+type State = Boolean
+
+init :: State
+init = false
+
+update :: Msg -> State -> State
+update Toggle = not
+
+view :: forall html. VD.Html html => State -> html Msg
+view state =
+  VD.div []
+    [ VD.label_
+        [ VD.input
+            [ VD.type_ "checkbox"
+            , VD.checked state
+            , VD.onChange (const Toggle)
+            ]
+
+        , VD.text "Checked?"
+        ]
+    ]
+```
+### Mount all components
+#### The manual way
+
+
+```hs
+module Sample.Record.Manually where
+
+import Prelude
+import Sample.Component1 as C1
+import Sample.Component2 as C2
+import Sample.Component3 as C3
+import VirtualDOM as VD
+
+data Msg
+  = Msg1 C1.Msg
+  | Msg2 C2.Msg
+  | Msg3 C3.Msg
+
+type State =
+  { state1 :: C1.State
+  , state2 :: C2.State
+  , state3 :: C3.State
   }
 
-view' :: forall html. V.Html html => State' -> html Msg'
-view' state =
-  V.div []
+init :: State
+init =
+  { state1: C1.init
+  , state2: C2.init
+  , state3: C3.init
+  }
+
+update :: Msg -> State -> State
+update msg state = case msg of
+  Msg1 childMsg -> state
+    { state1 = C1.update childMsg state.state1 }
+  Msg2 childMsg -> state
+    { state2 = C2.update childMsg state.state2 }
+  Msg3 childMsg -> state
+    { state3 = C3.update childMsg state.state3 }
+
+view :: forall html. VD.Html html => State -> html Msg
+view state =
+  VD.table_
+    [ VD.tr_
+        [ VD.td_ [ VD.text "field1" ]
+        , VD.td_ [ map Msg1 $ C1.view state.state1 ]
+        ]
+    , VD.tr_
+        [ VD.td_ [ VD.text "field2" ]
+        , VD.td_ [ map Msg2 $ C2.view state.state2 ]
+        ]
+    , VD.tr_
+        [ VD.td_ [ VD.text "field3" ]
+        , VD.td_ [ map Msg3 $ C3.view state.state3 ]
+        ]
+    ]
+```
+#### The generic way
+
+
+```hs
+module Sample.Record.Generically where
+
+import Prelude
+
+import MVC.Record (RecordMsg, RecordState(..), updateRecord, viewRecord)
+import Sample.Component1 as C1
+import Sample.Component2 as C2
+import Sample.Component3 as C3
+import VirtualDOM as VD
+
+type Msg = RecordMsg
+  ( field1 :: C1.Msg
+  , field2 :: C2.Msg
+  , field3 :: C3.Msg
+  )
+
+type State = RecordState
+  ( field1 :: C1.State
+  , field2 :: C2.State
+  , field3 :: C3.State
+  )
+
+init :: State
+init = RecordState
+  { field1: C1.init
+  , field2: C2.init
+  , field3: C3.init
+  }
+
+update :: Msg -> State -> State
+update = updateRecord
+  { field1: C1.update
+  , field2: C2.update
+  , field3: C3.update
+  }
+
+view :: forall html. VD.Html html => State -> html Msg
+view state =
+  VD.table_
     ( viewRecord
-        { field1: view1
-        , field2: view2
-        , field3: view3
+        { field1: C1.view
+        , field2: C2.view
+        , field3: C3.view
         }
         state
         # map \{ key, viewValue } ->
-            V.div_
-              [ V.div_ [ V.text ("Field " <> key <> ":") ]
-              , viewValue
+            VD.tr_
+              [ VD.td_ [ VD.text key ]
+              , VD.td_ [ viewValue ]
               ]
     )
 ```

@@ -2,6 +2,8 @@ module Test.MVC.RecordSpec where
 
 import Prelude
 
+import Data.Variant as V
+import MVC.Record (RecordMsg(..), RecordState(..), updateRecord, updateRecordRL)
 import MVC.Record as ME
 import Prim.RowList as RL
 import Type.Function (type ($), type (#))
@@ -43,28 +45,26 @@ testViewRL = ME.viewRL
       }
   )
 
-
 -----------------------------------------------------------
 --- Update
 -----------------------------------------------------------
 
-testUpdate :: State (field1 :: S1, field2 :: S2, field3 :: S3)
-testUpdate = update
+testUpdate :: RecordState (field1 :: S1, field2 :: S2, field3 :: S3)
+testUpdate = updateRecord
   { field1: \(_ :: M1) (_ :: S1) -> S1
   , field2: \(_ :: M2) (_ :: S2) -> S2
   , field3: \(_ :: M3) (_ :: S3) -> S3
   }
   (Set (V.inj (Proxy :: _ "field2") M2))
-  ( State
+  ( RecordState
       { field1: S1
       , field2: S2
       , field3: S3
       }
   )
 
-
-testUpdateRL :: State (field1 :: S1, field2 :: S2, field3 :: S3)
-testUpdateRL = updateRL
+testUpdateRL :: RecordState (field1 :: S1, field2 :: S2, field3 :: S3)
+testUpdateRL = updateRecordRL
   ( Proxy
       :: _ $ RL.Nil
            # RL.Cons "field3" Unit
@@ -75,7 +75,7 @@ testUpdateRL = updateRL
   , field2: \(_ :: M2) (_ :: S2) -> S2
   , field3: \(_ :: M3) (_ :: S3) -> S3
   }
-  ( State
+  ( RecordState
       { field1: S1
       , field2: S2
       , field3: S3

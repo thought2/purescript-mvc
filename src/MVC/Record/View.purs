@@ -11,10 +11,6 @@ import Prim.RowList as RL
 import Record as Record
 import Type.Proxy (Proxy(..))
 
------------------------------------------------------------
---- ViewRecord
------------------------------------------------------------
-
 type ViewResult :: (Type -> Type) -> Type -> Type
 type ViewResult html msg = { key :: String, viewValue :: html msg }
 
@@ -70,10 +66,10 @@ instance
   viewRL _ views (RecordState states) =
     [ head' ] <> tail'
     where
-    head :: { key :: String, value :: html msg }
+    head :: ViewResult html msg
     head =
       { key: reflectSymbol prxSym
-      , value: Record.get prxSym views state
+      , viewValue: Record.get prxSym views state
       }
 
     state :: sta
@@ -82,7 +78,7 @@ instance
     head' :: ViewResult html (RecordMsg rmsg)
     head' =
       { key: head.key
-      , viewValue: map (Set <<< V.inj prxSym) head.value
+      , viewValue: map (Set <<< V.inj prxSym) head.viewValue
       }
 
     tail :: Array (ViewResult html (RecordMsg rmsg'))

@@ -20,3 +20,26 @@ in  upstream
       , version =
           "main"
       }
+
+  with virtual-dom-halogen =
+      { dependencies =
+          [ "aff"
+          , "arrays"
+          , "bifunctors"
+          , "effect"
+          , "foreign"
+          , "halogen"
+          , "prelude"
+          , "safe-coerce"
+          , "strings"
+          , "tuples"
+          , "unsafe-coerce"
+          , "virtual-dom"
+          , "web-events"
+          , "web-html"
+          ]
+      , repo =
+          "https://github.com/thought2/purescript-virtual-dom-halogen.git"
+      , version =
+          "main"
+      }

@@ -2,11 +2,14 @@
   "name": "purescript-data-mvc",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "repository": "git@github.com:thought2/purescript-data-mvc.git",
   "author": "Michael Bock <no-day@posteo.net>",
   "license": "MIT",
   "devDependencies": {
     "markdown-magic": "^2.6.1",
-    "purs-to-md": "^0.2.1"
+    "parcel": "^2.8.3",
+    "purs-to-md": "^0.3.0",
+    "simpledotcss": "^2.2.1"
   }
 }
