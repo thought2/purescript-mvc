@@ -1,65 +1,59 @@
 import puppeteer from "puppeteer";
 import { PuppeteerScreenRecorder } from "puppeteer-screen-recorder";
 
-const Config = {
-  followNewTab: true,
-  fps: 25,
-  ffmpeg_Path: "<path of ffmpeg_path>" || null,
-  videoFrame: {
-    width: 1024,
-    height: 768,
-  },
-  videoCrf: 18,
-  videoCodec: "libx264",
-  videoPreset: "ultrafast",
-  videoBitrate: 1000,
-  autopad: {
-    color: "black" | "#35A5FF",
-  },
-  aspectRatio: "4:3",
-};
-
 (async () => {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: "new" });
 
   let page;
   let recorder;
 
+  console.log("UI1")
   page = await browser.newPage();
-  recorder = new PuppeteerScreenRecorder(page);
   await page.setViewport({ width: 200, height: 150 });
+  recorder = new PuppeteerScreenRecorder(page);
   await page.goto("http://localhost:1234#ui1");
   await demoUi1.prepare(page);
   await recorder.start("./assets/gif/ui1.mp4");
   await demoUi1.run(page);
   await recorder.stop();
 
+  console.log("UI2")
   page = await browser.newPage();
-  recorder = new PuppeteerScreenRecorder(page);
   await page.setViewport({ width: 200, height: 150 });
+  recorder = new PuppeteerScreenRecorder(page);
   await page.goto("http://localhost:1234#ui2");
   await demoUi2.prepare(page);
   await recorder.start("./assets/gif/ui2.mp4");
   await demoUi2.run(page);
   await recorder.stop();
 
+  console.log("UI3")
   page = await browser.newPage();
-  recorder = new PuppeteerScreenRecorder(page);
   await page.setViewport({ width: 200, height: 150 });
+  recorder = new PuppeteerScreenRecorder(page);
   await page.goto("http://localhost:1234#ui3");
   await demoUi3.prepare(page);
   await recorder.start("./assets/gif/ui3.mp4");
   await demoUi3.run(page);
   await recorder.stop();
 
+  console.log("UI Record")
   page = await browser.newPage();
-  recorder = new PuppeteerScreenRecorder(page);
   await page.setViewport({ width: 400, height: 450 });
+  recorder = new PuppeteerScreenRecorder(page);
   await page.goto("http://localhost:1234#ui-record");
   await recorder.start("./assets/gif/ui-record.mp4");
   await demoUi1.run(page);
   await demoUi2.run(page);
   await demoUi3.run(page);
+  await recorder.stop();
+
+  console.log("UI Variant")
+  page = await browser.newPage();
+  await page.setViewport({ width: 400, height: 450 });
+  recorder = new PuppeteerScreenRecorder(page);
+  await page.goto("http://localhost:1234#ui-variant");
+  await recorder.start("./assets/gif/ui-variant.mp4");
   await recorder.stop();
 
   await browser.close();

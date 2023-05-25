@@ -33,6 +33,8 @@ ui = uiRecord
   , field3: C3.ui
   }
   { view: { viewEntries } }
+---
+
 
 viewEntries
   :: forall html msg
@@ -48,8 +50,3 @@ viewEntries entries =
             , VD.td_ [ viewValue ]
             ]
     )
-
-
-{-
-![UI Record](./assets/gif/ui-record.gif)
--}

@@ -28,6 +28,8 @@ gen-readme:
     yarn run --silent purs-to-md --input-purs samples/03_Sample.Component3.purs --output-md - >> README.md
     yarn run --silent purs-to-md --input-purs samples/04_Sample.Record.Manually.purs --output-md - >> README.md
     yarn run --silent purs-to-md --input-purs samples/05_Sample.Record.Generically.purs --output-md - >> README.md
+    yarn run --silent purs-to-md --input-purs samples/06_Sample.Variant.Manually.purs --output-md - >> README.md
+    yarn run --silent purs-to-md --input-purs samples/07_Sample.Variant.Generically.purs --output-md - >> README.md
 
     yarn run md-magic
 
@@ -47,9 +49,12 @@ check-format:
 
 gen-gifs:
     rm -rf assets/gif
-    node run.js
+    node scripts/run-puppeteer.js
     for file in assets/gif/*.mp4; do \
       output="${file%.*}.gif" ; \
       ffmpeg -i $file  -y -loop 0 $output ; \
     done
     rm -rf assets/gif/*.mp4
+
+preview-md:
+    grip

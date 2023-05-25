@@ -10,6 +10,9 @@
   - [Mount all components](#mount-all-components)
     - [The manual way](#the-manual-way)
     - [The generic way](#the-generic-way)
+  - [Mount one component at a time](#mount-one-component-at-a-time)
+    - [The manual way](#the-manual-way-1)
+    - [The generic way](#the-generic-way-1)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 ## Sample
@@ -22,6 +25,8 @@ define framework agnostic HTML. The components have state which is defined by
 simple state update functions.
 
 #### Component 1
+
+![UI1](./assets/gif/ui1.gif)
 
 <details>
   <summary><code>Sample.Component1</code></summary>
@@ -63,10 +68,9 @@ view state =
 ui :: forall html. VD.Html html => UI html Msg State
 ui = { view, update, init }
 ```
-
-![UI1](./assets/gif/ui1.gif)
-
 #### Component 2
+
+![UI2](./assets/gif/ui2.gif)
 
 
 ```hs
@@ -99,10 +103,9 @@ view state =
 ui :: forall html. VD.Html html => UI html Msg State
 ui = { view, update, init }
 ```
-
-![UI2](./assets/gif/ui2.gif)
-
 #### Component 3
+
+![UI3](./assets/gif/ui3.gif)
 
 
 ```hs
@@ -139,10 +142,10 @@ view state =
 ui :: forall html. VD.Html html => UI html Msg State
 ui = { view, update, init }
 ```
-
-![UI3](./assets/gif/ui3.gif)
-
 ### Mount all components
+
+![UI Record](./assets/gif/ui-record.gif)
+
 #### The manual way
 
 
@@ -150,8 +153,6 @@ ui = { view, update, init }
 module Sample.Record.Manually where
 
 import Prelude
-
-import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
@@ -200,9 +201,6 @@ view state =
         , VD.td_ [ map Msg3 $ C3.view state.state3 ]
         ]
     ]
-
-ui :: forall html. VD.Html html => UI html Msg State
-ui = { view, update, init }
 ```
 #### The generic way
 
@@ -239,6 +237,8 @@ ui = uiRecord
   , field3: C3.ui
   }
   { view: { viewEntries } }
+---
+
 
 viewEntries
   :: forall html msg
@@ -255,6 +255,143 @@ viewEntries entries =
             ]
     )
 ```
+### Mount one component at a time
 
-![UI Record](./assets/gif/ui-record.gif)
+![UI Variant](./assets/gif/ui-variant.gif)
 
+#### The manual way
+
+
+```hs
+module Sample.Variant.Manually where
+
+import Prelude
+
+import MVC.Types (UI)
+import Sample.Component1 as C1
+import Sample.Component2 as C2
+import Sample.Component3 as C3
+import VirtualDOM as VD
+
+data Msg
+  = ChildMsg ChildMsg
+  | ChangeCase Case
+
+data Case = Case1 | Case2 | Case3
+
+data ChildMsg
+  = ChildMsg1 C1.Msg
+  | ChildMsg2 C2.Msg
+  | ChildMsg3 C3.Msg
+
+data State
+  = ChildState1 C1.State
+  | ChildState2 C2.State
+  | ChildState3 C3.State
+
+stateToCase :: State -> Case
+stateToCase state = case state of
+  ChildState1 _ -> Case1
+  ChildState2 _ -> Case2
+  ChildState3 _ -> Case3
+
+derive instance Eq State
+derive instance Eq Case
+
+init :: State
+init = ChildState1 C1.init
+
+update :: Msg -> State -> State
+update msg state = case msg of
+  ChildMsg childMsg -> case childMsg, state of
+    ChildMsg1 childMsg1, ChildState1 childState -> ChildState1 $ C1.update childMsg1 childState
+    ChildMsg2 childMsg2, ChildState2 childState -> ChildState2 $ C2.update childMsg2 childState
+    ChildMsg3 childMsg3, ChildState3 childState -> ChildState3 $ C3.update childMsg3 childState
+    _, _ -> state
+
+  ChangeCase case_ -> case case_ of
+    Case1 -> ChildState1 C1.init
+    Case2 -> ChildState2 C2.init
+    Case3 -> ChildState3 C3.init
+
+view :: forall html. VD.Html html => State -> html Msg
+view state =
+  VD.div [ VD.id "variant" ]
+    [ VD.select [ VD.onChange (handleCase >>> ChangeCase) ]
+        [ VD.option [ VD.value "Case1" ] [ VD.text "1" ]
+        , VD.option [ VD.value "Case2" ] [ VD.text "2" ]
+        , VD.option [ VD.value "Case3" ] [ VD.text "3" ]
+        ]
+    , VD.hr_
+    , map ChildMsg $ viewChild state
+    ]
+  where
+  handleCase = case _ of
+    "Case1" -> Case1
+    "Case2" -> Case2
+    "Case3" -> Case3
+    _ -> Case1
+
+viewChild :: forall html. VD.Html html => State -> html ChildMsg
+viewChild state = case state of
+  ChildState1 childState -> map ChildMsg1 $ C1.view childState
+  ChildState2 childState -> map ChildMsg2 $ C2.view childState
+  ChildState3 childState -> map ChildMsg3 $ C3.view childState
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = { view, update, init }
+```
+#### The generic way
+
+
+```hs
+module Sample.Variant.Generically where
+
+import Prelude
+
+import MVC.Types (UI)
+import MVC.Variant.Types (CaseKey(..), VariantMsg, VariantState)
+import MVC.Variant.UI (uiVariant)
+import Sample.Component1 as C1
+import Sample.Component2 as C2
+import Sample.Component3 as C3
+import Type.Proxy (Proxy(..))
+import VirtualDOM as VD
+
+type Msg = VariantMsg
+  ( case1 :: Unit
+  , case2 :: Unit
+  , case3 :: Unit
+  )
+  ( case1 :: C1.Msg
+  , case2 :: C2.Msg
+  , case3 :: C3.Msg
+  )
+
+type State = VariantState
+  ( case1 :: C1.State
+  , case2 :: C2.State
+  , case3 :: C3.State
+  )
+
+ui :: forall html. VD.Html html => UI html Msg State
+ui = uiVariant
+  { case1: C1.ui
+  , case2: C2.ui
+  , case3: C3.ui
+  }
+  { view: { viewUser }
+  , initCase: Proxy :: _ "case1"
+  }
+
+viewUser :: forall html a. VD.Html html => html a -> (CaseKey -> a) -> Array CaseKey -> html a
+viewUser viewCase mka xs =
+  VD.div [ VD.id "variant" ]
+    [ VD.select [ VD.onChange (CaseKey >>> mka) ]
+        ( xs # map \(CaseKey s) ->
+            VD.option [ VD.value s ] [ VD.text s ]
+        )
+    , VD.hr_
+    , viewCase
+    ]
+```

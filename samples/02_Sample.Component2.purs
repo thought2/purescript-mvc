@@ -1,5 +1,7 @@
 {-
 #### Component 2
+
+![UI2](./assets/gif/ui2.gif)
 -}
 
 module Sample.Component2 where
@@ -30,7 +32,3 @@ view state =
 
 ui :: forall html. VD.Html html => UI html Msg State
 ui = { view, update, init }
-
-{-
-![UI2](./assets/gif/ui2.gif)
--}

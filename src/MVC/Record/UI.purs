@@ -11,6 +11,7 @@ import Type.Proxy (Proxy(..))
 type UIRecordProps :: (Type -> Type) -> Type -> Type -> Type
 type UIRecordProps srf msg sta =
   { view :: ViewRecordProps srf msg
+  -- , entries :: UI 
   }
 
 class

@@ -15,6 +15,8 @@ simple state update functions.
 
 #### Component 1
 
+![UI1](./assets/gif/ui1.gif)
+
 <details>
   <summary><code>Sample.Component1</code></summary>
 -}
@@ -51,7 +53,3 @@ view state =
 
 ui :: forall html. VD.Html html => UI html Msg State
 ui = { view, update, init }
-
-{-
-![UI1](./assets/gif/ui1.gif)
--}
