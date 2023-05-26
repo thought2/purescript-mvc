@@ -1,7 +1,7 @@
 {-
 ### Mount all components
 
-![UI Record](./assets/gif/ui-record.gif)
+![UI Record](./assets/img/ui-record.png)
 
 #### The manual way
 -}

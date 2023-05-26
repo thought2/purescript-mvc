@@ -1,7 +1,8 @@
 {-
 #### Component 2
 
-![UI2](./assets/gif/ui2.gif)
+![UI2](./assets/img/ui2.png)
+
 -}
 
 module Sample.Component2 where

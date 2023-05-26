@@ -47,14 +47,10 @@ check-format:
     purs-tidy check "test/**/*.purs"
     purs-tidy check "samples/**/*.purs"
 
-gen-gifs:
-    rm -rf assets/gif
+gen-imgs:
+    rm -rf assets/img
+    mkdir -p assets/img
     node scripts/run-puppeteer.js
-    for file in assets/gif/*.mp4; do \
-      output="${file%.*}.gif" ; \
-      ffmpeg -i $file  -y -loop 0 $output ; \
-    done
-    rm -rf assets/gif/*.mp4
-
+    
 preview-md:
     grip

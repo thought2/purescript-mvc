@@ -15,7 +15,7 @@ simple state update functions.
 
 #### Component 1
 
-![UI1](./assets/gif/ui1.gif)
+![UI1](./assets/img/ui1.png)
 
 <details>
   <summary><code>Sample.Component1</code></summary>

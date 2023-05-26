@@ -26,7 +26,7 @@ simple state update functions.
 
 #### Component 1
 
-![UI1](./assets/gif/ui1.gif)
+![UI1](./assets/img/ui1.png)
 
 <details>
   <summary><code>Sample.Component1</code></summary>
@@ -70,7 +70,8 @@ ui = { view, update, init }
 ```
 #### Component 2
 
-![UI2](./assets/gif/ui2.gif)
+![UI2](./assets/img/ui2.png)
+
 
 
 ```hs
@@ -105,7 +106,8 @@ ui = { view, update, init }
 ```
 #### Component 3
 
-![UI3](./assets/gif/ui3.gif)
+![UI3](./assets/img/ui3.png)
+
 
 
 ```hs
@@ -144,7 +146,7 @@ ui = { view, update, init }
 ```
 ### Mount all components
 
-![UI Record](./assets/gif/ui-record.gif)
+![UI Record](./assets/img/ui-record.png)
 
 #### The manual way
 
@@ -257,7 +259,7 @@ viewEntries entries =
 ```
 ### Mount one component at a time
 
-![UI Variant](./assets/gif/ui-variant.gif)
+![UI Variant](./assets/img/ui-variant.png)
 
 #### The manual way
 

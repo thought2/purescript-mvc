@@ -1,7 +1,7 @@
 {-
 ### Mount one component at a time
 
-![UI Variant](./assets/gif/ui-variant.gif)
+![UI Variant](./assets/img/ui-variant.png)
 
 #### The manual way
 -}
