@@ -30,6 +30,8 @@ derive instance Newtype (VariantState r) _
 
 derive instance Generic (VariantMsg rcase rmsg) _
 
+derive instance Generic (VariantState r) _
+
 instance
   ( RowToList rcase rlcase
   , RowToList rmsg rlmsg
@@ -50,3 +52,18 @@ derive instance
   , VariantEqs rlmsg
   ) =>
   Eq (VariantMsg rcase rmsg)
+
+instance
+  ( RowToList r rl
+  , VariantTags rl
+  , VariantShows rl
+  ) =>
+  Show (VariantState r) where
+  show = genericShow
+
+derive instance
+  ( RowToList r rl
+  , VariantTags rl
+  , VariantEqs rl
+  ) =>
+  Eq (VariantState r)

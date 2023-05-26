@@ -63,12 +63,15 @@ spec =
             { field1: \msg _ -> case msg of
                 M1 -> S1
                 M1' -> S1'
+                M1'' -> S1''
             , field2: \msg _ -> case msg of
                 M2 -> S2
                 M2' -> S2'
+                M2'' -> S2''
             , field3: \msg _ -> case msg of
                 M3 -> S3
                 M3' -> S3'
+                M3'' -> S3''
             }
             (SetField (V.inj (Proxy :: _ "field2") M2'))
             ( RecordState
