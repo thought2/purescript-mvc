@@ -28,8 +28,6 @@ simple state update functions.
 
 ![UI1](./assets/img/ui1.png)
 
-<details>
-  <summary><code>Sample.Component1</code></summary>
 
 
 ```hs
@@ -39,12 +37,7 @@ import Prelude
 
 import MVC.Types (UI)
 import VirtualDOM as VD
-```
 
-</details>
-
-
-```hs
 data Msg = Increment | Decrement
 
 type State = Int
@@ -238,9 +231,9 @@ ui = uiRecord
   , field2: C2.ui
   , field3: C3.ui
   }
-  { view: { viewEntries } }
----
+  { viewEntries }
 
+---
 
 viewEntries
   :: forall html msg
