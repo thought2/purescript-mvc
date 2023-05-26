@@ -32,9 +32,9 @@ ui = uiRecord
   , field2: C2.ui
   , field3: C3.ui
   }
-  { view: { viewEntries } }
----
+  { viewEntries }
 
+---
 
 viewEntries
   :: forall html msg

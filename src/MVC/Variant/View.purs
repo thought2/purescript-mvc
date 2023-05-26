@@ -13,7 +13,7 @@ import Prim.RowList as RL
 import Record as Record
 import Type.Proxy (Proxy(..))
 
-type ViewVariantProps html = 
+type ViewVariantProps html =
   { viewUser :: forall a. html a -> (CaseKey -> a) -> Array CaseKey -> html a
   }
 

@@ -1,17 +1,19 @@
-module MVC.Record.UI where
+module MVC.Record.UI
+  ( UIRecordProps
+  , class UIRecord
+  , uiRecord
+  ) where
 
-import MVC.Record (class UpdateRecord, class ViewRecord, updateRecord, viewRecord)
+import MVC.Record (class UpdateRecord, class ViewRecord, ViewResult, updateRecord, viewRecord)
 import MVC.Record.Init (class InitRecord, initRecord)
 import MVC.Record.Types (RecordMsg, RecordState)
-import MVC.Record.View (ViewRecordProps)
 import MVC.Types (UI)
 import MVC.Util (class MapProp, mapProp)
 import Type.Proxy (Proxy(..))
 
 type UIRecordProps :: (Type -> Type) -> Type -> Type -> Type
 type UIRecordProps srf msg sta =
-  { view :: ViewRecordProps srf msg
-  -- , entries :: UI 
+  { viewEntries :: Array (ViewResult srf msg) -> srf msg
   }
 
 class
@@ -35,7 +37,7 @@ instance
   uiRecord uis props =
     { init: initRecord inits
     , update: updateRecord updates
-    , view: viewRecord views props.view
+    , view: viewRecord views { viewEntries: props.viewEntries }
     }
     where
     inits = mapProp prxInit uis

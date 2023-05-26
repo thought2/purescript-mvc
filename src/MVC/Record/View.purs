@@ -1,4 +1,11 @@
-module MVC.Record.View where
+module MVC.Record.View
+  ( ViewRecordProps
+  , ViewResult
+  , class ViewRecord
+  , class ViewRecordRL
+  , viewRecord
+  , viewRecordRL
+  ) where
 
 import Prelude
 
@@ -23,7 +30,7 @@ class
   ViewRecord html views rmsg rsta
 
   where
-  viewRecord :: Record views -> ViewRecordProps html (RecordMsg rmsg) -> RecordState rsta ->  html (RecordMsg rmsg)
+  viewRecord :: Record views -> ViewRecordProps html (RecordMsg rmsg) -> RecordState rsta -> html (RecordMsg rmsg)
 
 instance
   ( RowToList views rl
@@ -31,7 +38,7 @@ instance
   ) =>
   ViewRecord html views rmsg rsta
   where
-  viewRecord fieldViews props = viewRL prxRL fieldViews <#> props.viewEntries
+  viewRecord fieldViews props = viewRecordRL prxRL fieldViews <#> props.viewEntries
     where
     prxRL = Proxy :: _ rl
 
@@ -42,13 +49,13 @@ class
   ViewRecordRL html views rl rmsg rsta
   | rl -> rmsg rsta views
   where
-  viewRL
+  viewRecordRL
     :: Proxy rl
     -> Record views
     -> (RecordState rsta -> Array (ViewResult html (RecordMsg rmsg)))
 
 instance ViewRecordRL html () RL.Nil () () where
-  viewRL _ _ _ = []
+  viewRecordRL _ _ _ = []
 
 instance
   ( Functor html
@@ -67,7 +74,7 @@ instance
   ) =>
   ViewRecordRL html views (RL.Cons sym x rl') rmsg rsta
   where
-  viewRL _ views (RecordState states) =
+  viewRecordRL _ views (RecordState states) =
     [ head' ] <> tail'
     where
     head :: ViewResult html msg
@@ -82,16 +89,16 @@ instance
     head' :: ViewResult html (RecordMsg rmsg)
     head' =
       { key: head.key
-      , viewValue: map (Set <<< V.inj prxSym) head.viewValue
+      , viewValue: map (SetField <<< V.inj prxSym) head.viewValue
       }
 
     tail :: Array (ViewResult html (RecordMsg rmsg'))
-    tail = viewRL prxRL'
+    tail = viewRecordRL prxRL'
       (Record.delete prxSym views)
       (RecordState (Record.delete prxSym states))
 
     tail' :: Array (ViewResult html (RecordMsg rmsg))
-    tail' = map (\x -> x { viewValue = map (\(Set x') -> Set $ V.expand x') x.viewValue }) tail
+    tail' = map (\x -> x { viewValue = map (\(SetField x') -> SetField $ V.expand x') x.viewValue }) tail
 
     prxSym = Proxy :: _ sym
     prxRL' = Proxy :: _ rl'

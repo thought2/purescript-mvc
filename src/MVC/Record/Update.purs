@@ -1,4 +1,9 @@
-module MVC.Record.Update where
+module MVC.Record.Update
+  ( class UpdateRecord
+  , class UpdateRecordRL
+  , updateRecord
+  , updateRecordRL
+  ) where
 
 import Prelude
 
@@ -12,7 +17,8 @@ import Record as Record
 import Type.Proxy (Proxy(..))
 import MVC.Record.Types (RecordMsg(..), RecordState(..))
 
-class UpdateRecord updates  rmsg rsta 
+class
+  UpdateRecord updates rmsg rsta
   | updates -> rmsg rsta
   where
   updateRecord
@@ -23,9 +29,9 @@ instance
   ( RowToList rsta rl
   , UpdateRecordRL rl rsta rmsg updates
   ) =>
-  UpdateRecord updates rmsg rsta 
+  UpdateRecord updates rmsg rsta
   where
-  updateRecord updates (Set v) state =
+  updateRecord updates (SetField v) state =
     updateRecordRL (Proxy :: _ rl) updates state v
 
 ---

@@ -17,8 +17,6 @@ simple state update functions.
 
 ![UI1](./assets/img/ui1.png)
 
-<details>
-  <summary><code>Sample.Component1</code></summary>
 -}
 module Sample.Component1 where
 
@@ -26,10 +24,6 @@ import Prelude
 
 import MVC.Types (UI)
 import VirtualDOM as VD
-
-{-
-</details>
--}
 
 data Msg = Increment | Decrement
 

@@ -1,4 +1,7 @@
-module MVC.Record.Init where
+module MVC.Record.Init
+  ( class InitRecord
+  , initRecord
+  ) where
 
 import MVC.Record (RecordState(..))
 

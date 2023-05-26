@@ -44,4 +44,4 @@ testUi = uiRecord
   , field2: ui2
   , field3: ui3
   }
-  { view: { viewEntries: \_ -> HTML } }
+  { viewEntries: \_ -> HTML }

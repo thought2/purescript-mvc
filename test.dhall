@@ -14,5 +14,6 @@ in conf // {
     , "integers"
     , "maybe"
     , "routing"
+    , "spec-discovery"
     ]
 }

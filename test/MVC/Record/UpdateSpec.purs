@@ -15,7 +15,7 @@ testUpdate = updateRecord
   , field2: \(_ :: M2) (_ :: S2) -> S2
   , field3: \(_ :: M3) (_ :: S3) -> S3
   }
-  (Set (V.inj (Proxy :: _ "field2") M2))
+  (SetField (V.inj (Proxy :: _ "field2") M2))
   ( RecordState
       { field1: S1
       , field2: S2
