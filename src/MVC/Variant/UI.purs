@@ -3,14 +3,14 @@ module MVC.Variant.UI where
 import MVC.Types (UI)
 import MVC.Util (class MapProp, mapProp)
 import MVC.Variant.Init (class InitVariant, initVariant)
-import MVC.Variant.Types (VariantMsg, VariantState)
+import MVC.Variant.Types (CaseKey, VariantMsg, VariantState)
 import MVC.Variant.Update (class UpdateVariant, updateVariant)
-import MVC.Variant.View (class ViewVariant, ViewVariantProps, viewVariant)
+import MVC.Variant.View (class ViewVariant, viewVariant)
 import Type.Proxy (Proxy(..))
 
 type UIVariantProps :: forall k. (Type -> Type) -> k -> Type
 type UIVariantProps srf initsym =
-  { view :: ViewVariantProps srf
+  { view :: forall a. srf a -> (CaseKey -> a) -> CaseKey -> Array CaseKey -> srf a
   , initCase :: Proxy initsym
   }
 
@@ -47,7 +47,7 @@ instance
     update = updateVariant inits updates
 
     view :: VariantState rsta -> srf (VariantMsg rcase rmsg)
-    view = viewVariant props.view views
+    view = viewVariant { view: props.view } views
 
     inits = mapProp prxInit uis
     updates = mapProp prxUpdate uis

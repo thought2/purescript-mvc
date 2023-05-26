@@ -6,6 +6,7 @@ module Sample.Variant.Generically where
 
 import Prelude
 
+import Data.Newtype (un)
 import MVC.Types (UI)
 import MVC.Variant.Types (CaseKey(..), VariantMsg, VariantState)
 import MVC.Variant.UI (uiVariant)
@@ -37,15 +38,18 @@ ui = uiVariant
   , case2: C2.ui
   , case3: C3.ui
   }
-  { view: { viewUser }
+  { view
   , initCase: Proxy :: _ "case1"
   }
 
-viewUser :: forall html a. VD.Html html => html a -> (CaseKey -> a) -> Array CaseKey -> html a
-viewUser viewCase mka xs =
+view :: forall html a. VD.Html html => html a -> (CaseKey -> a) -> CaseKey -> Array CaseKey -> html a
+view viewCase mka key keys =
   VD.div [ VD.id "variant" ]
-    [ VD.select [ VD.onChange (CaseKey >>> mka) ]
-        ( xs # map \(CaseKey s) ->
+    [ VD.select
+        [ VD.value $ un CaseKey key
+        , VD.onChange (CaseKey >>> mka)
+        ]
+        ( keys # map \(CaseKey s) ->
             VD.option [ VD.value s ] [ VD.text s ]
         )
     , VD.hr_

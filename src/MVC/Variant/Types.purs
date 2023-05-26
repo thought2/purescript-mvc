@@ -2,8 +2,12 @@ module MVC.Variant.Types where
 
 import Prelude
 
+import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype)
-import Data.Variant (Variant)
+import Data.Show.Generic (genericShow)
+import Data.Variant (class VariantEqs, class VariantShows, Variant)
+import Data.Variant.Internal (class VariantTags)
+import Prim.RowList (class RowToList)
 
 newtype VariantState r = VariantState (Variant r)
 
@@ -23,3 +27,26 @@ derive instance Eq CaseKey
 derive instance Newtype CaseKey _
 
 derive instance Newtype (VariantState r) _
+
+derive instance Generic (VariantMsg rcase rmsg) _
+
+instance
+  ( RowToList rcase rlcase
+  , RowToList rmsg rlmsg
+  , VariantTags rlcase
+  , VariantTags rlmsg
+  , VariantShows rlcase
+  , VariantShows rlmsg
+  ) =>
+  Show (VariantMsg rcase rmsg) where
+  show = genericShow
+
+derive instance
+  ( RowToList rcase rlcase
+  , RowToList rmsg rlmsg
+  , VariantTags rlcase
+  , VariantTags rlmsg
+  , VariantEqs rlcase
+  , VariantEqs rlmsg
+  ) =>
+  Eq (VariantMsg rcase rmsg)

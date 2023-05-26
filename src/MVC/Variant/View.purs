@@ -1,4 +1,20 @@
-module MVC.Variant.View where
+module MVC.Variant.View
+  ( ViewVariantProps
+  , caseKeyToVariant
+  , caseKeyToVariantRL
+  , class CaseKeyToVariant
+  , class CaseKeyToVariantRL
+  , class GetKeys
+  , class GetSym
+  , class GetSymRL
+  , class ViewVariant
+  , class ViewVariantRL
+  , getKeys
+  , viewVariant
+  , viewVariantRL
+  , getSym
+  , getSymRL
+  ) where
 
 import Prelude
 
@@ -14,7 +30,7 @@ import Record as Record
 import Type.Proxy (Proxy(..))
 
 type ViewVariantProps html =
-  { viewUser :: forall a. html a -> (CaseKey -> a) -> Array CaseKey -> html a
+  { view :: forall a. html a -> (CaseKey -> a) -> CaseKey -> Array CaseKey -> html a
   }
 
 class ViewVariant :: (Type -> Type) -> Row Type -> Row Type -> Row Type -> Row Type -> Constraint
@@ -29,12 +45,13 @@ instance
   , CaseKeyToVariant rcase
   , Functor html
   , GetKeys rl
+  , GetSym rsta
   ) =>
   ViewVariant html views rcase rmsg rsta where
   viewVariant d views (VariantState rsta) = viewUser'
     where
     viewCases :: html (Variant rmsg)
-    viewCases = viewRL prxRl views rsta
+    viewCases = viewVariantRL prxRl views rsta
 
     viewCases' :: html (VariantMsg rcase rmsg)
     viewCases' = viewCases # map ChildCaseMsg
@@ -45,7 +62,11 @@ instance
       Just vcase -> ChangeCase vcase
 
     viewUser' :: html (VariantMsg rcase rmsg)
-    viewUser' = d.viewUser viewCases' caseKeyToVariantMsg (CaseKey <$> getKeys prxRl)
+    viewUser' = d.view
+      viewCases'
+      caseKeyToVariantMsg
+      (CaseKey $ getSym rsta)
+      (CaseKey <$> getKeys prxRl)
 
     prxRl = Proxy :: Proxy rl
 
@@ -106,10 +127,10 @@ class
   ViewVariantRL rl html views rmsg rsta
   | rl -> rmsg rsta
   where
-  viewRL :: Proxy rl -> Record views -> Variant rsta -> html (Variant rmsg)
+  viewVariantRL :: Proxy rl -> Record views -> Variant rsta -> html (Variant rmsg)
 
 instance ViewVariantRL RL.Nil html views () () where
-  viewRL _ _ = V.case_
+  viewVariantRL _ _ = V.case_
 
 instance
   ( ViewVariantRL rl' html views rmsg' rsta'
@@ -124,13 +145,13 @@ instance
   ) =>
   ViewVariantRL (RL.Cons sym x rl') html views rmsg rsta
   where
-  viewRL _ views =
+  viewVariantRL _ views =
     tail'
       # V.on prxSym viewFn'
 
     where
     tail :: Variant rsta' -> html (Variant rmsg')
-    tail = viewRL prxRl' views
+    tail = viewVariantRL prxRl' views
 
     tail' :: Variant rsta' -> html (Variant rmsg)
     tail' = tail >>> map V.expand
@@ -163,3 +184,43 @@ instance (IsSymbol sym, GetKeys rl') => GetKeys (RL.Cons sym a rl') where
     prxSym = Proxy :: Proxy sym
     prxRl' = Proxy :: Proxy rl'
 
+--------------------------------------------------------------------------------
+-- GetSym
+--------------------------------------------------------------------------------
+
+class GetSym r where
+  getSym :: Variant r -> String
+
+instance
+  ( RowToList r rl
+  , GetSymRL rl r
+  ) =>
+  GetSym r where
+  getSym = getSymRL (Proxy :: Proxy rl)
+
+---
+class GetSymRL rl r | rl -> r where
+  getSymRL :: Proxy rl -> Variant r -> String
+
+instance GetSymRL RL.Nil () where
+  getSymRL _ = V.case_
+
+instance
+  ( GetSymRL rl' r'
+  , Row.Cons sym a r' r
+  , IsSymbol sym
+  , Row.Lacks sym r'
+  , Row.Union r' rx r
+  ) =>
+  GetSymRL (RL.Cons sym a rl') r
+  where
+  getSymRL _ =
+    getSymRL prxRl'
+      # V.on prxSym getSym'
+
+    where
+    getSym' :: a -> String
+    getSym' _ = reflectSymbol prxSym
+
+    prxSym = Proxy :: Proxy sym
+    prxRl' = Proxy :: Proxy rl'
