@@ -10,6 +10,7 @@ import Data.Newtype (un)
 import MVC.Types (UI)
 import MVC.Variant.Types (CaseKey(..), VariantMsg, VariantState)
 import MVC.Variant.UI (uiVariant)
+import MVC.Variant.View (ViewArgs)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
@@ -42,14 +43,14 @@ ui = uiVariant
   , initCase: Proxy :: _ "case1"
   }
 
-view :: forall html a. VD.Html html => html a -> (CaseKey -> a) -> CaseKey -> Array CaseKey -> html a
-view viewCase mka key keys =
+view :: forall html msg. VD.Html html => ViewArgs html msg -> html msg
+view { viewCase, mkMsg, caseKey, caseKeys } =
   VD.div [ VD.id "variant" ]
     [ VD.select
-        [ VD.value $ un CaseKey key
-        , VD.onChange (CaseKey >>> mka)
+        [ VD.value $ un CaseKey caseKey
+        , VD.onChange (CaseKey >>> mkMsg)
         ]
-        ( keys # map \(CaseKey s) ->
+        ( caseKeys # map \(CaseKey s) ->
             VD.option [ VD.value s ] [ VD.text s ]
         )
     , VD.hr_

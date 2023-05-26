@@ -9,7 +9,7 @@ import Data.Variant as V
 import MVC.Variant.Types (CaseKey(..), VariantMsg(..), VariantState(..))
 import MVC.Variant.View (caseKeyToVariantRL, getKeys, viewVariantRL, viewVariant)
 import Prim.RowList as RL
-import Test.MVC.TestTypes (HTML(..), M1(..), M2, M3, S1(..), S2(..), S3)
+import Test.MVC.TestTypes (HTML(..), M1, M2, M3, S1(..), S2(..), S3)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Type.Function (type (#), type ($))
@@ -30,7 +30,7 @@ testView
            )
        )
 testView = viewVariant
-  { view: \_ _ _ _ -> HTML
+  { view: \_ -> HTML
   }
   { case1: \(_ :: S1) -> HTML :: _ M1
   , case2: \(_ :: S2) -> HTML :: _ M2
@@ -107,13 +107,13 @@ spec =
         let
           actual :: TestHtml Msg
           actual = viewVariant
-            { view: \viewCase mkMsg key keys ->
+            { view: \{ viewCase, mkMsg, caseKey, caseKeys } ->
                 VD.div_
                   [ VD.select
                       [ VD.onChange (CaseKey >>> mkMsg)
-                      , VD.value $ un CaseKey key
+                      , VD.value $ un CaseKey caseKey
                       ]
-                      ( keys # map \(CaseKey s) ->
+                      ( caseKeys # map \(CaseKey s) ->
                           VD.option [ VD.value s ] [ VD.text s ]
                       )
                   , VD.hr_

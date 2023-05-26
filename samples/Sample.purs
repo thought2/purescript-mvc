@@ -8,10 +8,7 @@ import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
 import Sample.Record.Generically as RG
-import Sample.Record.Generically as Sample.Record.Generically
-import Sample.Record.Manually as Sample.Record.Manually
 import Sample.Variant.Generically as VG
-import Sample.Variant.Manually as VM
 import VirtualDOM.Impl.Halogen as H
 
 main :: Effect Unit
@@ -24,14 +21,3 @@ main = do
     "ui-record" -> H.uiMountAtId "root" RG.ui
     "ui-variant" -> H.uiMountAtId "root" VG.ui
     _ -> pure unit
-
--- H.uiMountAtId "root-manual"
---   { view: Sample.Record.Manually.view
---   , init: Sample.Record.Manually.init
---   , update: Sample.Record.Manually.update
---   }
--- H.uiMountAtId "root-generic"
---   { view: Sample.Record.Generically.view
---   , init: Sample.Record.Generically.init
---   , update: Sample.Record.Generically.update
---   }

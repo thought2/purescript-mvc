@@ -51,6 +51,6 @@ testUi = uiVariant
   , case2: ui2
   , case3: ui3
   }
-  { view: \_ _ _ _ -> HTML
+  { view: \_ -> HTML
   , initCase: Proxy :: _ "case1"
   }

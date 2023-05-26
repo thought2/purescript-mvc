@@ -1,5 +1,6 @@
 module MVC.Variant.View
-  ( ViewVariantProps
+  ( ViewArgs
+  , ViewVariantProps
   , caseKeyToVariant
   , caseKeyToVariantRL
   , class CaseKeyToVariant
@@ -10,10 +11,10 @@ module MVC.Variant.View
   , class ViewVariant
   , class ViewVariantRL
   , getKeys
-  , viewVariant
-  , viewVariantRL
   , getSym
   , getSymRL
+  , viewVariant
+  , viewVariantRL
   ) where
 
 import Prelude
@@ -29,8 +30,15 @@ import Prim.RowList as RL
 import Record as Record
 import Type.Proxy (Proxy(..))
 
+type ViewArgs src msg =
+  { viewCase :: src msg
+  , mkMsg :: CaseKey -> msg
+  , caseKey :: CaseKey
+  , caseKeys :: Array CaseKey
+  }
+
 type ViewVariantProps html =
-  { view :: forall a. html a -> (CaseKey -> a) -> CaseKey -> Array CaseKey -> html a
+  { view :: forall msg. ViewArgs html msg -> html msg
   }
 
 class ViewVariant :: (Type -> Type) -> Row Type -> Row Type -> Row Type -> Row Type -> Constraint
@@ -63,10 +71,11 @@ instance
 
     viewUser' :: html (VariantMsg rcase rmsg)
     viewUser' = d.view
-      viewCases'
-      caseKeyToVariantMsg
-      (CaseKey $ getSym rsta)
-      (CaseKey <$> getKeys prxRl)
+      { viewCase: viewCases'
+      , mkMsg: caseKeyToVariantMsg
+      , caseKey: CaseKey $ getSym rsta
+      , caseKeys: CaseKey <$> getKeys prxRl
+      }
 
     prxRl = Proxy :: Proxy rl
 
@@ -199,6 +208,7 @@ instance
   getSym = getSymRL (Proxy :: Proxy rl)
 
 ---
+class GetSymRL :: forall k. k -> Row Type -> Constraint
 class GetSymRL rl r | rl -> r where
   getSymRL :: Proxy rl -> Variant r -> String
 
