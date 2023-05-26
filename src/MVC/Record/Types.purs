@@ -21,3 +21,10 @@ derive newtype instance (RowToList r rl, VariantTags rl, VariantEqs rl) => Eq (R
 
 instance (RowToList r rl, VariantTags rl, VariantShows rl) => Show (RecordMsg r) where
   show = genericShow
+
+derive instance Generic (RecordState r) _
+
+derive newtype instance (Eq (Record r)) => Eq (RecordState r)
+
+instance (Show (Record r)) => Show (RecordState r) where
+  show = genericShow

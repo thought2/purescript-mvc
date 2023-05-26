@@ -5,17 +5,17 @@ import Prelude
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 
-data M1 = M1
-data M2 = M2
-data M3 = M3
+data M1 = M1 | M1'
+data M2 = M2 | M2'
+data M3 = M3 | M3'
 
-data S1 = S1
-data S2 = S2
-data S3 = S3
+data S1 = S1 | S1'
+data S2 = S2 | S2'
+data S3 = S3 | S3'
 
-data T1 = T1
-data T2 = T2
-data T3 = T3
+data T1 = T1 | T1'
+data T2 = T2 | T2'
+data T3 = T3 | T3'
 
 data HTML :: Type -> Type
 data HTML a = HTML
