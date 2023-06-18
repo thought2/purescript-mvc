@@ -1,3 +1,7 @@
-module MVC.Variant where
+module MVC.Variant
+  ( module Export
+  ) where
 
--- import Prelude
+import MVC.Variant.Types as Export
+import MVC.Variant.View as Export
+import MVC.Variant.Update as Export
