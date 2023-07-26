@@ -1,4 +1,4 @@
-{ name = "data-mvc"
+{ name = "mvc"
 , dependencies =
   [ "heterogeneous", "maybe", "newtype", "prelude", "record", "variant" ]
 , packages = ./packages.dhall

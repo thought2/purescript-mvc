@@ -1,9 +1,9 @@
 {
-  "name": "purescript-data-mvc",
+  "name": "purescript-mvc",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "repository": "git@github.com:thought2/purescript-data-mvc.git",
+  "repository": "git@github.com:thought2/purescript-mvc.git",
   "author": "Michael Bock <no-day@posteo.net>",
   "license": "MIT",
   "devDependencies": {

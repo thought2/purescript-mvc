@@ -1,5 +1,7 @@
 {-
-# purescript-data-mvc
+# purescript-mvc
+
+MVC types and some relatated generic functions
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 <!-- AUTO-GENERATED-CONTENT:END -->
