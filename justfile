@@ -33,6 +33,9 @@ gen-readme:
 
     yarn run md-magic
 
+gen-purs-docs:
+    FILE=.spago/package.json; echo '{}' > $FILE; spago docs; echo '{"type": "module"}' > $FILE
+
 run:
     yarn run parcel static/index.html
 

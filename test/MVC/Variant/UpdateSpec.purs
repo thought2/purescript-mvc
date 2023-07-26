@@ -5,7 +5,7 @@ import Prelude
 import Data.Variant (Variant)
 import Data.Variant as V
 import MVC.Variant.Types (VariantMsg(..), VariantState(..))
-import MVC.Variant.Update (matchCase, matchCaseRL, updateRL, updateVariant)
+import MVC.Variant.Update (matchCase, matchCaseRL, updateVariantRL, updateVariant)
 import Prim.RowList as RL
 import Test.MVC.TestTypes (M1(..), M2(..), M3, S1(..), S2(..), S3(..))
 import Test.Spec (Spec, describe, it)
@@ -40,7 +40,7 @@ testUpdate2 = updateVariant
   (VariantState (V.inj (Proxy :: Proxy "case1") S1))
 
 testUpdateRL :: Variant (case1 :: S1, case2 :: S2, case3 :: S3)
-testUpdateRL = updateRL
+testUpdateRL = updateVariantRL
   ( Proxy
       :: _ $ RL.Nil
            # RL.Cons "case1" Unit

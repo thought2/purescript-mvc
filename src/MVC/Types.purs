@@ -1,4 +1,7 @@
-module MVC.Types where
+module MVC.Types
+  ( UI
+  , uiFromView
+  ) where
 
 import Prelude
 

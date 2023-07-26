@@ -1,4 +1,13 @@
-module MVC.Variant.Update where
+module MVC.Variant.Update
+  ( class MatchCase
+  , matchCase
+  , class MatchCaseRL
+  , matchCaseRL
+  , class UpdateVariant
+  , updateVariant
+  , class UpdateVariantRL
+  , updateVariantRL
+  ) where
 
 import Prelude
 
@@ -12,39 +21,73 @@ import Prim.RowList as RL
 import Record as Record
 import Type.Proxy (Proxy(..))
 
-class UpdateVariant :: Row Type -> Row Type -> Row Type -> Row Type -> Row Type -> Constraint
+--------------------------------------------------------------------------------
+--- UpdateVariant
+--------------------------------------------------------------------------------
+
 class
-  UpdateVariant initstates updates rcase rmsg rsta
+  UpdateVariant
+    (initstates :: Row Type)
+    (updates :: Row Type)
+    (rcase :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   where
-  updateVariant :: Record initstates -> Record updates -> VariantMsg rcase rmsg -> VariantState rsta -> VariantState rsta
+  updateVariant
+    :: Record initstates
+    -> Record updates
+    -> (VariantMsg rcase rmsg -> VariantState rsta -> VariantState rsta)
 
 instance
   ( UpdateVariantRL rl updates rmsg rsta
   , RowToList updates rl
   , MatchCase rcase initstates rsta
   ) =>
-  UpdateVariant initstates updates rcase rmsg rsta where
-  updateVariant initVariantStates updates msg (VariantState vsta) = case msg of
-    ChildCaseMsg vmsg ->
-      VariantState $ updateRL prxRl updates vmsg vsta
-    ChangeCase vcase ->
-      VariantState $ matchCase initVariantStates vcase
-    ErrMsg _ ->
-      VariantState vsta
+  UpdateVariant initstates updates rcase rmsg rsta
+  where
+  updateVariant
+    :: Record initstates
+    -> Record updates
+    -> (VariantMsg rcase rmsg -> VariantState rsta -> VariantState rsta)
+  updateVariant initVariantStates updates msg (VariantState vsta) =
+    case msg of
+      ChildCaseMsg vmsg ->
+        VariantState $ updateVariantRL prxRl updates vmsg vsta
+
+      ChangeCase vcase ->
+        VariantState $ matchCase initVariantStates vcase
+
+      ErrMsg _ ->
+        VariantState vsta
+
     where
-    prxRl = Proxy :: Proxy rl
+    prxRl :: Proxy rl
+    prxRl = Proxy
 
----
+--------------------------------------------------------------------------------
+--- UpdateVariantRL
+--------------------------------------------------------------------------------
 
-class UpdateVariantRL :: RowList Type -> Row Type -> Row Type -> Row Type -> Constraint
 class
-  UpdateVariantRL rl updates rmsg rsta
+  UpdateVariantRL
+    (rl :: RowList Type)
+    (updates :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   | rl -> rsta
   where
-  updateRL :: Proxy rl -> Record updates -> Variant rmsg -> Variant rsta -> Variant rsta
+  updateVariantRL
+    :: Proxy rl
+    -> Record updates
+    -> (Variant rmsg -> Variant rsta -> Variant rsta)
 
-instance UpdateVariantRL RL.Nil updates rmsg () where
-  updateRL _ _ _ = V.case_
+instance UpdateVariantRL RL.Nil updates rmsg ()
+  where
+  updateVariantRL
+    :: Proxy RL.Nil
+    -> Record updates
+    -> (Variant rmsg -> Variant () -> Variant ())
+  updateVariantRL _ _ _ = V.case_
 
 instance
   ( Row.Cons sym (msg -> sta -> sta) updatesx updates
@@ -61,7 +104,11 @@ instance
   ) =>
   UpdateVariantRL (RL.Cons sym x rl') updates rmsg rsta
   where
-  updateRL _ updates vmsg =
+  updateVariantRL
+    :: Proxy (RL.Cons sym x rl')
+    -> Record updates
+    -> (Variant rmsg -> Variant rsta -> Variant rsta)
+  updateVariantRL _ updates vmsg =
     tail'
       # V.on prxSym
           \sta -> V.inj prxSym $
@@ -71,7 +118,7 @@ instance
     where
 
     tail :: Variant rsta' -> Variant rsta'
-    tail = updateRL prxRl' updates vmsg
+    tail = updateVariantRL prxRl' updates vmsg
 
     tail' :: Variant rsta' -> Variant rsta
     tail' = tail >>> V.expand
@@ -79,14 +126,21 @@ instance
     updateFn :: msg -> sta -> sta
     updateFn = Record.get prxSym updates
 
-    prxSym = Proxy :: Proxy sym
-    prxRl' = Proxy :: Proxy rl'
+    prxSym :: Proxy sym
+    prxSym = Proxy
 
----
+    prxRl' :: Proxy rl'
+    prxRl' = Proxy
 
-class MatchCase :: Row Type -> Row Type -> Row Type -> Constraint
+--------------------------------------------------------------------------------
+--- MatchCase
+--------------------------------------------------------------------------------
+
 class
-  MatchCase rcase initstates rsta
+  MatchCase
+    (rcase :: Row Type)
+    (initstates :: Row Type)
+    (rsta :: Row Type)
   where
   matchCase :: Record initstates -> Variant rcase -> Variant rsta
 
@@ -94,17 +148,28 @@ instance
   ( MatchCaseRL rl rcase initstates rsta
   , RowToList initstates rl
   ) =>
-  MatchCase rcase initstates rsta where
+  MatchCase rcase initstates rsta
+  where
+  matchCase :: Record initstates -> Variant rcase -> Variant rsta
   matchCase = matchCaseRL (Proxy :: Proxy rl)
 
-class MatchCaseRL :: RowList Type -> Row Type -> Row Type -> Row Type -> Constraint
+--------------------------------------------------------------------------------
+--- MatchCaseRL
+--------------------------------------------------------------------------------
+
 class
-  MatchCaseRL rl rcase initstates rsta
+  MatchCaseRL
+    (rl :: RowList Type)
+    (rcase :: Row Type)
+    (initstates :: Row Type)
+    (rsta :: Row Type)
   | rl -> rcase
   where
   matchCaseRL :: Proxy rl -> Record initstates -> Variant rcase -> Variant rsta
 
-instance MatchCaseRL RL.Nil () initstates rsta where
+instance MatchCaseRL RL.Nil () initstates rsta
+  where
+  matchCaseRL :: Proxy RL.Nil -> Record initstates -> Variant () -> Variant rsta
   matchCaseRL _ _ = V.case_
 
 instance
@@ -115,7 +180,9 @@ instance
   , MatchCaseRL rl' rcase' initstates rsta
   , IsSymbol sym
   ) =>
-  MatchCaseRL (RL.Cons sym x rl') rcase initstates rsta where
+  MatchCaseRL (RL.Cons sym x rl') rcase initstates rsta
+  where
+  matchCaseRL :: Proxy (RL.Cons sym x rl') -> Record initstates -> Variant rcase -> Variant rsta
   matchCaseRL _ initVariantStates =
     tail
       # V.on prxSym (\_ -> V.inj prxSym $ initVariantState)
@@ -127,6 +194,9 @@ instance
     tail :: Variant rcase' -> Variant rsta
     tail = matchCaseRL prxRl' initVariantStates
 
-    prxRl' = Proxy :: Proxy rl'
-    prxSym = Proxy :: Proxy sym
+    prxRl' :: Proxy rl'
+    prxRl' = Proxy
+
+    prxSym :: Proxy sym
+    prxSym = Proxy
 

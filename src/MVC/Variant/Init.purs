@@ -1,4 +1,7 @@
-module MVC.Variant.Init where
+module MVC.Variant.Init
+  ( class InitVariant
+  , initVariant
+  ) where
 
 import Prelude
 
@@ -9,9 +12,11 @@ import Prim.Row as Row
 import Record as Record
 import Type.Proxy (Proxy)
 
-class InitVariant :: Symbol -> Row Type -> Row Type -> Constraint
 class
-  InitVariant sym initstates rsta
+  InitVariant
+    (sym :: Symbol)
+    (initstates :: Row Type)
+    (rsta :: Row Type)
   where
   initVariant :: Proxy sym -> Record initstates -> VariantState rsta
 
@@ -22,7 +27,9 @@ instance
   ) =>
   InitVariant sym initstates rsta
   where
-  initVariant prxSym initStates = VariantState $ V.inj prxSym state
+  initVariant :: Proxy sym -> Record initstates -> VariantState rsta
+  initVariant prxSym initStates =
+    VariantState $ V.inj prxSym state
     where
     state :: sta
     state = Record.get prxSym initStates

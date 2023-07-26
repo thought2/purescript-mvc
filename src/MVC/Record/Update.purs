@@ -17,8 +17,15 @@ import Record as Record
 import Type.Proxy (Proxy(..))
 import MVC.Record.Types (RecordMsg(..), RecordState(..))
 
+--------------------------------------------------------------------------------
+--- UpdateRecord
+--------------------------------------------------------------------------------
+
 class
-  UpdateRecord updates rmsg rsta
+  UpdateRecord
+    (updates :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   | updates -> rmsg rsta
   where
   updateRecord
@@ -31,19 +38,30 @@ instance
   ) =>
   UpdateRecord updates rmsg rsta
   where
+  updateRecord :: Record updates -> RecordMsg rmsg -> RecordState rsta -> RecordState rsta
   updateRecord updates (SetField v) state =
     updateRecordRL (Proxy :: _ rl) updates state v
 
----
+--------------------------------------------------------------------------------
+--- UpdateRecordRL
+--------------------------------------------------------------------------------
 
-class UpdateRecordRL :: RowList Type -> Row Type -> Row Type -> Row Type -> Constraint
-class UpdateRecordRL rl rs rm updates | rl -> rs rm updates where
+class
+  UpdateRecordRL
+    (rl :: RowList Type)
+    (rs :: Row Type)
+    (rm :: Row Type)
+    (updates :: Row Type)
+  | rl -> rs rm updates
+  where
   updateRecordRL
     :: Proxy rl
     -> Record updates
     -> (RecordState rs -> Variant rm -> RecordState rs)
 
-instance UpdateRecordRL RL.Nil rs () () where
+instance UpdateRecordRL RL.Nil rs () ()
+  where
+  updateRecordRL :: Proxy RL.Nil -> Record () -> (RecordState rs -> Variant () -> RecordState rs)
   updateRecordRL _ _ _ = V.case_
 
 instance
@@ -56,7 +74,12 @@ instance
   , Row.Lacks sym rsx
   , Row.Lacks sym updates'
   ) =>
-  UpdateRecordRL (RL.Cons sym x rl') rs rm updates where
+  UpdateRecordRL (RL.Cons sym x rl') rs rm updates
+  where
+  updateRecordRL
+    :: Proxy (RL.Cons sym x rl')
+    -> Record updates
+    -> (RecordState rs -> Variant rm -> RecordState rs)
   updateRecordRL _ updates (RecordState r) =
     tail
       # V.on prxSym
@@ -73,5 +96,8 @@ instance
         (Record.delete prxSym updates)
         (RecordState r)
 
-    prxSym = Proxy :: _ sym
-    prxRL' = Proxy :: _ rl'
+    prxSym :: Proxy sym
+    prxSym = Proxy
+
+    prxRL' :: Proxy rl'
+    prxRL' = Proxy

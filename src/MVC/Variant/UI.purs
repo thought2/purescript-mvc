@@ -1,4 +1,8 @@
-module MVC.Variant.UI where
+module MVC.Variant.UI
+  ( UIVariantProps
+  , class UIVariant
+  , uiVariant
+  ) where
 
 import MVC.Types (UI)
 import MVC.Util (class MapProp, mapProp)
@@ -8,15 +12,24 @@ import MVC.Variant.Update (class UpdateVariant, updateVariant)
 import MVC.Variant.View (class ViewVariant, ViewArgs, viewVariant)
 import Type.Proxy (Proxy(..))
 
-type UIVariantProps :: forall k. (Type -> Type) -> k -> Type
+type UIVariantProps :: (Type -> Type) -> Symbol -> Type
 type UIVariantProps srf initsym =
   { view :: forall msg. ViewArgs srf msg -> srf msg
   , initCase :: Proxy initsym
   }
 
-class UIVariant :: Row Type -> (Type -> Type) -> Symbol -> Row Type -> Row Type -> Row Type -> Constraint
+--------------------------------------------------------------------------------
+--- UIVariant
+--------------------------------------------------------------------------------
+
 class
-  UIVariant uis srf initsym rcase rmsg rsta
+  UIVariant
+    (uis :: Row Type)
+    (srf :: Type -> Type)
+    (initsym :: Symbol)
+    (rcase :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   | uis -> srf initsym rmsg rsta
   where
   uiVariant
@@ -33,12 +46,18 @@ instance
   , ViewVariant srf views rcase rmsg rsta
   ) =>
   UIVariant uis srf initsym rcase rmsg rsta where
+  uiVariant
+    :: Record uis
+    -> UIVariantProps srf initsym
+    -> UI srf (VariantMsg rcase rmsg) (VariantState rsta)
   uiVariant uis props =
     { init
     , update
     , view
     }
+
     where
+    -- Fields
 
     init :: VariantState rsta
     init = initVariant props.initCase inits
@@ -49,10 +68,24 @@ instance
     view :: VariantState rsta -> srf (VariantMsg rcase rmsg)
     view = viewVariant { view: props.view } views
 
+    -- Records
+
+    inits :: Record inits
     inits = mapProp prxInit uis
+
+    updates :: Record updates
     updates = mapProp prxUpdate uis
+
+    views :: Record views
     views = mapProp prxView uis
 
-    prxInit = Proxy :: _ "init"
-    prxUpdate = Proxy :: _ "update"
-    prxView = Proxy :: _ "view"
+    -- Proxies
+
+    prxInit :: Proxy "init"
+    prxInit = Proxy
+
+    prxUpdate :: Proxy "update"
+    prxUpdate = Proxy
+
+    prxView :: Proxy "view"
+    prxView = Proxy

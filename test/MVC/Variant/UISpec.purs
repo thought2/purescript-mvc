@@ -7,6 +7,7 @@ import MVC.Variant.Types (VariantMsg, VariantState)
 import MVC.Variant.UI (uiVariant)
 import Test.MVC.TestTypes (HTML(..), M1, M2, M3, S1(..), S2(..), S3(..))
 import Type.Proxy (Proxy(..))
+import Test.Spec (Spec, describe, it)
 
 type Msg = VariantMsg
   ( case1 :: Unit
@@ -54,3 +55,9 @@ testUi = uiVariant
   { view: \_ -> HTML
   , initCase: Proxy :: _ "case1"
   }
+
+spec :: Spec Unit
+spec =
+  describe "MVC.Variant.UI" do
+    it "should compile" do
+      void $ pure testUi

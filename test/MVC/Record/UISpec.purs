@@ -1,9 +1,12 @@
 module Test.MVC.Record.UISpec where
 
+import Prelude
+
 import MVC.Record (RecordMsg, RecordState)
 import MVC.Record.UI (uiRecord)
 import MVC.Types (UI)
 import Test.MVC.TestTypes (HTML(..), M1, M2, M3, S1(..), S2(..), S3(..))
+import Test.Spec (Spec, describe, it)
 
 type Msg = RecordMsg
   ( field1 :: M1
@@ -45,3 +48,9 @@ testUi = uiRecord
   , field3: ui3
   }
   { viewEntries: \_ -> HTML }
+
+spec :: Spec Unit
+spec =
+  describe "MVC.Record.UI" do
+    it "should compile" do
+      void $ pure testUi

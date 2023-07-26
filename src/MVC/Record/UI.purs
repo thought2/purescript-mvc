@@ -17,7 +17,11 @@ type UIRecordProps srf msg sta =
   }
 
 class
-  UIRecord uis srf rmsg rsta
+  UIRecord
+    (uis :: Row Type)
+    (srf :: Type -> Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   | uis -> srf rmsg rsta
   where
   uiRecord
@@ -33,17 +37,36 @@ instance
   , UpdateRecord updates rmsg rsta
   , ViewRecord srf views rmsg rsta
   ) =>
-  UIRecord uis srf rmsg rsta where
+  UIRecord uis srf rmsg rsta
+  where
+  uiRecord
+    :: Record uis
+    -> UIRecordProps srf (RecordMsg rmsg) (RecordState rsta)
+    -> UI srf (RecordMsg rmsg) (RecordState rsta)
   uiRecord uis props =
     { init: initRecord inits
     , update: updateRecord updates
     , view: viewRecord views { viewEntries: props.viewEntries }
     }
     where
+    --- Records
+
+    inits :: Record inits
     inits = mapProp prxInit uis
+
+    updates :: Record updates
     updates = mapProp prxUpdate uis
+
+    views :: Record views
     views = mapProp prxView uis
 
-    prxInit = Proxy :: _ "init"
-    prxUpdate = Proxy :: _ "update"
-    prxView = Proxy :: _ "view"
+    -- Proxies
+
+    prxInit :: Proxy "init"
+    prxInit = Proxy
+
+    prxUpdate :: Proxy "update"
+    prxUpdate = Proxy
+
+    prxView :: Proxy "view"
+    prxView = Proxy

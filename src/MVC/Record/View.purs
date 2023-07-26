@@ -25,12 +25,21 @@ type ViewRecordProps html msg =
   { viewEntries :: Array (ViewResult html msg) -> html msg
   }
 
-class ViewRecord :: (Type -> Type) -> Row Type -> Row Type -> Row Type -> Constraint
-class
-  ViewRecord html views rmsg rsta
+--------------------------------------------------------------------------------
+--- ViewRecord
+--------------------------------------------------------------------------------
 
+class
+  ViewRecord
+    (html :: Type -> Type)
+    (views :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   where
-  viewRecord :: Record views -> ViewRecordProps html (RecordMsg rmsg) -> RecordState rsta -> html (RecordMsg rmsg)
+  viewRecord
+    :: Record views
+    -> ViewRecordProps html (RecordMsg rmsg)
+    -> (RecordState rsta -> html (RecordMsg rmsg))
 
 instance
   ( RowToList views rl
@@ -38,15 +47,27 @@ instance
   ) =>
   ViewRecord html views rmsg rsta
   where
+  viewRecord
+    :: Record views
+    -> ViewRecordProps html (RecordMsg rmsg)
+    -> RecordState rsta
+    -> html (RecordMsg rmsg)
   viewRecord fieldViews props = viewRecordRL prxRL fieldViews <#> props.viewEntries
     where
-    prxRL = Proxy :: _ rl
+    prxRL :: Proxy rl
+    prxRL = Proxy
 
----
+--------------------------------------------------------------------------------
+--- ViewRecordRL
+--------------------------------------------------------------------------------
 
-class ViewRecordRL :: (Type -> Type) -> Row Type -> RowList Type -> Row Type -> Row Type -> Constraint
 class
-  ViewRecordRL html views rl rmsg rsta
+  ViewRecordRL
+    (html :: Type -> Type)
+    (views :: Row Type)
+    (rl :: RowList Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   | rl -> rmsg rsta views
   where
   viewRecordRL
@@ -55,6 +76,10 @@ class
     -> (RecordState rsta -> Array (ViewResult html (RecordMsg rmsg)))
 
 instance ViewRecordRL html () RL.Nil () () where
+  viewRecordRL
+    :: Proxy RL.Nil
+    -> Record ()
+    -> (RecordState () -> Array (ViewResult html (RecordMsg ())))
   viewRecordRL _ _ _ = []
 
 instance
@@ -74,6 +99,11 @@ instance
   ) =>
   ViewRecordRL html views (RL.Cons sym x rl') rmsg rsta
   where
+  viewRecordRL
+    :: Proxy (RL.Cons sym x rl')
+    -> Record views
+    -> RecordState rsta
+    -> Array (ViewResult html (RecordMsg rmsg))
   viewRecordRL _ views (RecordState states) =
     [ head' ] <> tail'
     where
@@ -100,6 +130,9 @@ instance
     tail' :: Array (ViewResult html (RecordMsg rmsg))
     tail' = map (\x -> x { viewValue = map (\(SetField x') -> SetField $ V.expand x') x.viewValue }) tail
 
-    prxSym = Proxy :: _ sym
-    prxRL' = Proxy :: _ rl'
+    prxSym :: Proxy sym
+    prxSym = Proxy
+
+    prxRL' :: Proxy rl'
+    prxRL' = Proxy
 

@@ -1,4 +1,8 @@
-module MVC.Variant.Types where
+module MVC.Variant.Types
+  ( CaseKey(..)
+  , VariantMsg(..)
+  , VariantState(..)
+  ) where
 
 import Prelude
 

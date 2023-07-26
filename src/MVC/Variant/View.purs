@@ -41,11 +41,21 @@ type ViewVariantProps html =
   { view :: forall msg. ViewArgs html msg -> html msg
   }
 
-class ViewVariant :: (Type -> Type) -> Row Type -> Row Type -> Row Type -> Row Type -> Constraint
+--------------------------------------------------------------------------------
+--- ViewVariant
+--------------------------------------------------------------------------------
+
 class
-  ViewVariant html views rcase rmsg rsta
+  ViewVariant
+    (html :: Type -> Type)
+    (views :: Row Type)
+    (rcase :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   where
-  viewVariant :: ViewVariantProps html -> Record views -> VariantState rsta -> html (VariantMsg rcase rmsg)
+  viewVariant
+    :: ViewVariantProps html
+    -> (Record views -> VariantState rsta -> html (VariantMsg rcase rmsg))
 
 instance
   ( ViewVariantRL rl html views rmsg rsta
@@ -55,7 +65,11 @@ instance
   , GetKeys rl
   , GetSym rsta
   ) =>
-  ViewVariant html views rcase rmsg rsta where
+  ViewVariant html views rcase rmsg rsta
+  where
+  viewVariant
+    :: ViewVariantProps html
+    -> (Record views -> VariantState rsta -> html (VariantMsg rcase rmsg))
   viewVariant d views (VariantState rsta) = viewUser'
     where
     viewCases :: html (Variant rmsg)
@@ -77,28 +91,43 @@ instance
       , caseKeys: CaseKey <$> getKeys prxRl
       }
 
-    prxRl = Proxy :: Proxy rl
+    prxRl :: Proxy rl
+    prxRl = Proxy
 
----
+--------------------------------------------------------------------------------
+--- CaseKeyToVariant
+--------------------------------------------------------------------------------
 
-class CaseKeyToVariant rcase where
+class
+  CaseKeyToVariant
+    (rcase :: Row Type)
+  where
   caseKeyToVariant :: CaseKey -> Maybe (Variant rcase)
 
 instance
   ( CaseKeyToVariantRL rl rcase
   , RowToList rcase rl
   ) =>
-  CaseKeyToVariant rcase where
+  CaseKeyToVariant rcase
+  where
+  caseKeyToVariant :: CaseKey -> Maybe (Variant rcase)
   caseKeyToVariant = caseKeyToVariantRL (Proxy :: Proxy rl)
 
-class CaseKeyToVariantRL :: RowList Type -> Row Type -> Constraint
+--------------------------------------------------------------------------------
+--- CaseKeyToVariantRL
+--------------------------------------------------------------------------------
+
 class
-  CaseKeyToVariantRL rl rcase
+  CaseKeyToVariantRL
+    (rl :: RowList Type)
+    (rcase :: Row Type)
   | rl -> rcase
   where
   caseKeyToVariantRL :: Proxy rl -> CaseKey -> Maybe (Variant rcase)
 
-instance CaseKeyToVariantRL RL.Nil () where
+instance CaseKeyToVariantRL RL.Nil ()
+  where
+  caseKeyToVariantRL :: Proxy RL.Nil -> CaseKey -> Maybe (Variant ())
   caseKeyToVariantRL _ _ = Nothing
 
 instance
@@ -108,7 +137,9 @@ instance
   , IsSymbol sym
   , Row.Union rcase' rcasex rcase
   ) =>
-  CaseKeyToVariantRL (RL.Cons sym x rl') rcase where
+  CaseKeyToVariantRL (RL.Cons sym x rl') rcase
+  where
+  caseKeyToVariantRL :: Proxy (RL.Cons sym x rl') -> CaseKey -> Maybe (Variant rcase)
   caseKeyToVariantRL _ givenKey =
     if caseKey == givenKey then
       head
@@ -127,18 +158,29 @@ instance
     tail' :: Maybe (Variant rcase)
     tail' = tail # map V.expand
 
-    prxSym = Proxy :: Proxy sym
-    prxRl' = Proxy :: Proxy rl'
+    prxSym :: Proxy sym
+    prxSym = Proxy
 
----
-class ViewVariantRL :: RowList Type -> (Type -> Type) -> Row Type -> Row Type -> Row Type -> Constraint
+    prxRl' :: Proxy rl'
+    prxRl' = Proxy
+
+--------------------------------------------------------------------------------
+--- ViewVariantRL
+--------------------------------------------------------------------------------
+
 class
-  ViewVariantRL rl html views rmsg rsta
+  ViewVariantRL
+    (rl :: RowList Type)
+    (html :: Type -> Type)
+    (views :: Row Type)
+    (rmsg :: Row Type)
+    (rsta :: Row Type)
   | rl -> rmsg rsta
   where
   viewVariantRL :: Proxy rl -> Record views -> Variant rsta -> html (Variant rmsg)
 
 instance ViewVariantRL RL.Nil html views () () where
+  viewVariantRL :: Proxy RL.Nil -> Record views -> Variant () -> html (Variant ())
   viewVariantRL _ _ = V.case_
 
 instance
@@ -154,6 +196,7 @@ instance
   ) =>
   ViewVariantRL (RL.Cons sym x rl') html views rmsg rsta
   where
+  viewVariantRL :: Proxy (RL.Cons sym x rl') -> Record views -> Variant rsta -> html (Variant rmsg)
   viewVariantRL _ views =
     tail'
       # V.on prxSym viewFn'
@@ -171,48 +214,69 @@ instance
     viewFn' :: sta -> html (Variant rmsg)
     viewFn' = viewFn >>> map (V.inj prxSym)
 
-    prxSym = Proxy :: Proxy sym
-    prxRl' = Proxy :: Proxy rl'
+    prxSym :: Proxy sym
+    prxSym = Proxy
+
+    prxRl' :: Proxy rl'
+    prxRl' = Proxy
 
 --------------------------------------------------------------------------------
--- Keys
+-- GetKeys
 --------------------------------------------------------------------------------
 
-class GetKeys :: RowList Type -> Constraint
-class GetKeys rl where
+class GetKeys (rl :: RowList Type) where
   getKeys :: Proxy rl -> Array String
 
 instance GetKeys RL.Nil where
+  getKeys :: Proxy RL.Nil -> Array String
   getKeys _ = []
 
 instance (IsSymbol sym, GetKeys rl') => GetKeys (RL.Cons sym a rl') where
+  getKeys :: Proxy (RL.Cons sym a rl') -> Array String
   getKeys _ = [ head ] <> tail
     where
+    head :: String
     head = reflectSymbol prxSym
+
+    tail :: Array String
     tail = getKeys prxRl'
-    prxSym = Proxy :: Proxy sym
-    prxRl' = Proxy :: Proxy rl'
+
+    prxSym :: Proxy sym
+    prxSym = Proxy
+
+    prxRl' :: Proxy rl'
+    prxRl' = Proxy
 
 --------------------------------------------------------------------------------
 -- GetSym
 --------------------------------------------------------------------------------
 
-class GetSym r where
+class GetSym (r :: Row Type) where
   getSym :: Variant r -> String
 
 instance
   ( RowToList r rl
   , GetSymRL rl r
   ) =>
-  GetSym r where
+  GetSym r
+  where
+  getSym :: Variant r -> String
   getSym = getSymRL (Proxy :: Proxy rl)
 
----
-class GetSymRL :: forall k. k -> Row Type -> Constraint
-class GetSymRL rl r | rl -> r where
+--------------------------------------------------------------------------------
+--- GetSymRL
+--------------------------------------------------------------------------------
+
+class
+  GetSymRL
+    (rl :: RowList Type)
+    (r :: Row Type)
+  | rl -> r
+  where
   getSymRL :: Proxy rl -> Variant r -> String
 
 instance GetSymRL RL.Nil () where
+  getSymRL :: Proxy RL.Nil -> Variant () -> String
   getSymRL _ = V.case_
 
 instance
@@ -224,6 +288,7 @@ instance
   ) =>
   GetSymRL (RL.Cons sym a rl') r
   where
+  getSymRL :: Proxy (RL.Cons sym a rl') -> Variant r -> String
   getSymRL _ =
     getSymRL prxRl'
       # V.on prxSym getSym'
@@ -232,5 +297,8 @@ instance
     getSym' :: a -> String
     getSym' _ = reflectSymbol prxSym
 
-    prxSym = Proxy :: Proxy sym
-    prxRl' = Proxy :: Proxy rl'
+    prxSym :: Proxy sym
+    prxSym = Proxy
+
+    prxRl' :: Proxy rl'
+    prxRl' = Proxy
