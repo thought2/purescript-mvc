@@ -11,8 +11,8 @@ import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Type.Function (type (#), type ($))
 import Type.Proxy (Proxy(..))
-import VirtualDOM as VD
-import VirtualDOM.Impl.TestHtml (TestHtml)
+import Chameleon as VD
+import Chameleon.Impl.TestHtml (TestHtml)
 
 testView
   :: HTML

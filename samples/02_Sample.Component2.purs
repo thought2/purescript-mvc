@@ -8,7 +8,7 @@
 module Sample.Component2 where
 
 import MVC.Types (UI)
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg = SetName String
 

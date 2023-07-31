@@ -14,7 +14,7 @@ import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg
   = ChildMsg ChildMsg

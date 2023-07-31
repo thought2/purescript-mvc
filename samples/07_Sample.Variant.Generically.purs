@@ -15,7 +15,7 @@ import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
 import Type.Proxy (Proxy(..))
-import VirtualDOM as VD
+import Chameleon as VD
 
 type Msg = VariantMsg
   ( case1 :: Unit

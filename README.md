@@ -22,7 +22,7 @@ MVC types and some relatated generic functions
 ### Sample Components
 To demonstrate the use of this library, we'll first define three simple UI
 components. We'll use the
-[virtual-dom](https://github.com/thought2/purescript-virtual-dom) library to
+[chameleon](https://github.com/thought2/purescript-chameleon) library to
 define framework agnostic HTML. The components have state which is defined by
 simple state update functions.
 
@@ -38,7 +38,7 @@ module Sample.Component1 where
 import Prelude
 
 import MVC.Types (UI)
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg = Increment | Decrement
 
@@ -73,7 +73,7 @@ ui = { view, update, init }
 module Sample.Component2 where
 
 import MVC.Types (UI)
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg = SetName String
 
@@ -111,7 +111,7 @@ module Sample.Component3 where
 import Prelude
 
 import MVC.Types (UI)
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg = Toggle
 
@@ -153,7 +153,7 @@ import Prelude
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg
   = Msg1 C1.Msg
@@ -213,7 +213,7 @@ import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
-import VirtualDOM as VD
+import Chameleon as VD
 
 type Msg = RecordMsg
   ( field1 :: C1.Msg
@@ -268,7 +268,7 @@ import MVC.Types (UI)
 import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg
   = ChildMsg ChildMsg
@@ -355,7 +355,7 @@ import Sample.Component1 as C1
 import Sample.Component2 as C2
 import Sample.Component3 as C3
 import Type.Proxy (Proxy(..))
-import VirtualDOM as VD
+import Chameleon as VD
 
 type Msg = VariantMsg
   ( case1 :: Unit

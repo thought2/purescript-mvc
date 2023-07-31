@@ -10,7 +10,7 @@ module Sample.Component3 where
 import Prelude
 
 import MVC.Types (UI)
-import VirtualDOM as VD
+import Chameleon as VD
 
 data Msg = Toggle
 

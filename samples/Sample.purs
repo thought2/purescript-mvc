@@ -9,7 +9,7 @@ import Sample.Component2 as C2
 import Sample.Component3 as C3
 import Sample.Record.Generically as RG
 import Sample.Variant.Generically as VG
-import VirtualDOM.Impl.Halogen as H
+import Chameleon.Impl.Halogen as H
 
 main :: Effect Unit
 main = do
